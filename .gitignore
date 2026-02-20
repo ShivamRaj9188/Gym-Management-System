@@ -1,0 +1,16 @@
+# Mac
+.DS_Store
+
+# Node
+node_modules/
+dist/
+
+# Logs
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+target/
