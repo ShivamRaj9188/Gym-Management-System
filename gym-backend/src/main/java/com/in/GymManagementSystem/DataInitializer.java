@@ -1,33 +1,27 @@
 package com.in.GymManagementSystem;
 
+import com.in.GymManagementSystem.entity.User;
+import com.in.GymManagementSystem.repository.UserRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import lombok.RequiredArgsConstructor;
 
-import com.in.GymManagementSystem.entity.Member;
-import com.in.GymManagementSystem.entity.Trainer;
-import com.in.GymManagementSystem.repository.MemberRepository;
-import com.in.GymManagementSystem.repository.TrainerRepository;
+@Configuration
+public class DataInitializer {
 
-@Component
-@RequiredArgsConstructor
-public class DataInitializer implements CommandLineRunner {
+    @Bean
+    CommandLineRunner initUsers(UserRepository userRepository) {
+        return args -> {
+            if (userRepository.findByUsername("admin").isEmpty()) {
 
-    private final MemberRepository memberRepository;
-    private final TrainerRepository trainerRepository;
+                User admin = User.builder()
+                        .username("admin")
+                        .password("admin123")
+                        .role("ADMIN")
+                        .build();
 
-    @Override
-    public void run(String... args) {
-
-        if (memberRepository.count() == 0) {
-            memberRepository.save(new Member(null, "Rahul", "Gold", true));
-            memberRepository.save(new Member(null, "Amit", "Silver", false));
-            memberRepository.save(new Member(null, "Priya", "Gold", true));
-        }
-
-        if (trainerRepository.count() == 0) {
-            trainerRepository.save(new Trainer(null, "John", "Strength"));
-            trainerRepository.save(new Trainer(null, "David", "Cardio"));
-        }
+                userRepository.save(admin);
+            }
+        };
     }
 }
