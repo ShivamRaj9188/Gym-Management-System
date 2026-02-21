@@ -1,7 +1,15 @@
 import { NavLink } from "react-router-dom";
+import { getStoredUser, isAuthenticated, logoutUser } from "../services/AuthService";
 
 function Navbar() {
   const getLinkClass = ({ isActive }) => (isActive ? "nav-link active" : "nav-link");
+  const isLoggedIn = isAuthenticated();
+  const currentUser = getStoredUser();
+
+  const handleLogout = () => {
+    logoutUser();
+    window.location.href = "/login";
+  };
 
   return (
     <nav className="navbar navbar-expand-lg bg-white rounded shadow-sm px-3 py-2">
@@ -19,31 +27,56 @@ function Navbar() {
 
       <div className="collapse navbar-collapse" id="gymMainNavbar">
         <ul className="navbar-nav nav-pills gap-1 w-100">
-          <li className="nav-item">
-            <NavLink className={getLinkClass} to="/">
-              Dashboard
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className={getLinkClass} to="/members">
-              Member Plans
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className={getLinkClass} to="/trainers">
-              Trainer Assignment
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className={getLinkClass} to="/attendance">
-              Attendance
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink className={getLinkClass} to="/payments">
-              Payment Tracking
-            </NavLink>
-          </li>
+          {isLoggedIn ? (
+            <>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/">
+                  Dashboard
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/members">
+                  Member Plans
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/trainers">
+                  Trainer Assignment
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/attendance">
+                  Attendance
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/payments">
+                  Payment Tracking
+                </NavLink>
+              </li>
+              <li className="nav-item ms-lg-auto d-flex align-items-center px-2 text-secondary">
+                {currentUser?.username}
+              </li>
+              <li className="nav-item">
+                <button className="btn btn-outline-danger btn-sm mt-1 mt-lg-0" type="button" onClick={handleLogout}>
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="nav-item ms-lg-auto">
+                <NavLink className={getLinkClass} to="/login">
+                  Login
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink className={getLinkClass} to="/signup">
+                  Sign Up
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>
