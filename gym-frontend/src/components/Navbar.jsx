@@ -1,9 +1,8 @@
 import { NavLink } from "react-router-dom";
-import { getStoredUser, isAuthenticated, logoutUser } from "../services/AuthService";
+import { getStoredUser, logoutUser } from "../services/AuthService";
 
-function Navbar() {
+function Navbar({ isLoggedIn }) {
   const getLinkClass = ({ isActive }) => (isActive ? "nav-link active" : "nav-link");
-  const isLoggedIn = isAuthenticated();
   const currentUser = getStoredUser();
 
   const handleLogout = () => {

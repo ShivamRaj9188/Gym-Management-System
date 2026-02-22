@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
@@ -11,7 +12,17 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { isAuthenticated } from "./services/AuthService";
 
 function App() {
-  const isLoggedIn = isAuthenticated();
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
+  useEffect(() => {
+    const syncAuth = () => setIsLoggedIn(isAuthenticated());
+    window.addEventListener("auth-changed", syncAuth);
+    window.addEventListener("storage", syncAuth);
+    return () => {
+      window.removeEventListener("auth-changed", syncAuth);
+      window.removeEventListener("storage", syncAuth);
+    };
+  }, []);
 
   return (
     <div className="container-fluid min-vh-100 bg-light py-4">
@@ -23,9 +34,14 @@ function App() {
           </div>
         </header>
 
-        <Navbar />
+        <Navbar isLoggedIn={isLoggedIn} />
 
         <main className="mt-3">
+          {!isLoggedIn ? (
+            <section className="alert alert-info border-0 shadow-sm mb-3" role="alert">
+              Login to access all modules: Dashboard, Member Plans, Trainer Assignment, Attendance, and Payments.
+            </section>
+          ) : null}
           <Routes>
             <Route
               path="/"

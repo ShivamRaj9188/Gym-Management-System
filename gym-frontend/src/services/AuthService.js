@@ -2,10 +2,12 @@ import axios from "axios";
 
 const AUTH_API_URL = "http://localhost:9999/api/auth";
 const AUTH_USER_KEY = "gymUser";
+const AUTH_CHANGE_EVENT = "auth-changed";
 
 export const loginUser = async credentials => {
   const response = await axios.post(`${AUTH_API_URL}/login`, credentials);
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.data));
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
   return response.data;
 };
 
@@ -32,4 +34,5 @@ export const isAuthenticated = () => Boolean(getStoredUser());
 
 export const logoutUser = () => {
   localStorage.removeItem(AUTH_USER_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
 };
