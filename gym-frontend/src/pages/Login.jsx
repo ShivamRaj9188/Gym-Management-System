@@ -41,10 +41,20 @@ function Login() {
     }
   };
 
+  const useDemoCredentials = () => {
+    setUsername("admin");
+    setPassword("admin123");
+    setError("");
+    setMessage("");
+  };
+
   return (
     <section className="card border-0 shadow-sm">
       <div className="card-body p-4">
         <h2 className="h3 mb-3">Login</h2>
+        <div className="alert alert-secondary py-2" role="alert">
+          Demo credentials: <strong>admin</strong> / <strong>admin123</strong>
+        </div>
 
         <form className="col-12 col-md-6 col-lg-5" onSubmit={handleSubmit}>
           <input
@@ -65,6 +75,9 @@ function Login() {
 
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
+          </button>
+          <button className="btn btn-outline-secondary ms-2" type="button" onClick={useDemoCredentials}>
+            Use Demo
           </button>
         </form>
 
