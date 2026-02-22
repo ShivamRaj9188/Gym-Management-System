@@ -1,0 +1,14 @@
+package com.in.GymManagementSystem.services;
+
+import com.in.GymManagementSystem.dto.MemberDTO;
+import java.util.List;
+
+public interface MemberService {
+    List<MemberDTO> getAllMembers();
+    MemberDTO getMemberById(Long id);
+    MemberDTO createMember(MemberDTO memberDTO);
+    MemberDTO updateMember(Long id, MemberDTO memberDTO);
+    void deleteMember(Long id);
+    MemberDTO assignTrainer(Long memberId, Long trainerId);
+    MemberDTO removeTrainer(Long memberId, Long trainerId);
+}
