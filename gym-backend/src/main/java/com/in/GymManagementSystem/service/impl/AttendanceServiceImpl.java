@@ -3,9 +3,10 @@ package com.in.GymManagementSystem.service.impl;
 import com.in.GymManagementSystem.dto.AttendanceDTO;
 import com.in.GymManagementSystem.entity.Attendance;
 import com.in.GymManagementSystem.entity.Member;
+import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.AttendanceRepository;
 import com.in.GymManagementSystem.repository.MemberRepository;
-import com.in.GymManagementSystem.services.AttendanceService;
+import com.in.GymManagementSystem.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO) {
         Member member = memberRepository.findById(attendanceDTO.getMemberId())
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
 
         LocalDate today = LocalDate.now();
         LocalDate attendanceDate = attendanceDTO.getDate() != null ? attendanceDTO.getDate() : today;
@@ -73,7 +74,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public AttendanceDTO checkOut(Long id) {
         Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attendance record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance record not found"));
 
         if (attendance.getDate() != null && !attendance.getDate().equals(LocalDate.now())) {
             throw new IllegalArgumentException("Attendance checkout is only allowed for today.");
@@ -91,7 +92,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public void deleteAttendance(Long id) {
         Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attendance record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance record not found"));
         attendanceRepository.delete(attendance);
     }
 

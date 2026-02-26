@@ -1,7 +1,7 @@
 package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.dto.PlanDTO;
-import com.in.GymManagementSystem.services.PlanService;
+import com.in.GymManagementSystem.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/plans")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"})
 @RequiredArgsConstructor
 public class PlanController {
 

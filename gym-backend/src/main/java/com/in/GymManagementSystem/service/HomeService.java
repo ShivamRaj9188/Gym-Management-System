@@ -1,4 +1,4 @@
-package com.in.GymManagementSystem.services;
+package com.in.GymManagementSystem.service;
 
 import com.in.GymManagementSystem.dto.HomeDashboardDTO;
 

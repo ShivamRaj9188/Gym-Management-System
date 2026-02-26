@@ -3,8 +3,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/testdb
-    username: shivamraj
-    password: 9188
+    username: ${DB_USERNAME:shivamraj}
+    password: ${DB_PASSWORD:9188}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,5 +21,5 @@ spring:
       schema-locations: classpath:db/schema-alignment.sql
 
 jwt:
-  secret: "change-this-secret-to-a-long-random-string"
+  secret: ${JWT_SECRET:change-this-secret-to-a-long-random-string}
   expiration-ms: 86400000

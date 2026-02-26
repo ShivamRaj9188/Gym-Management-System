@@ -2,8 +2,9 @@ package com.in.GymManagementSystem.service.impl;
 
 import com.in.GymManagementSystem.dto.TrainerDTO;
 import com.in.GymManagementSystem.entity.Trainer;
+import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.TrainerRepository;
-import com.in.GymManagementSystem.services.TrainerService;
+import com.in.GymManagementSystem.service.TrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public TrainerDTO getTrainerById(Long id) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
         return convertToDTO(trainer);
     }
 
@@ -54,7 +55,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     public TrainerDTO updateTrainer(Long id, TrainerDTO trainerDTO) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
         String normalizedEmail = normalizeEmail(trainerDTO.getEmail());
         String normalizedPhone = normalizePhone(trainerDTO.getPhone());
         ensureUniqueTrainerContact(normalizedEmail, normalizedPhone, id);

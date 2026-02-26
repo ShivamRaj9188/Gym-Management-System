@@ -2,8 +2,9 @@ package com.in.GymManagementSystem.service.impl;
 
 import com.in.GymManagementSystem.dto.PlanDTO;
 import com.in.GymManagementSystem.entity.Plan;
+import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.PlanRepository;
-import com.in.GymManagementSystem.services.PlanService;
+import com.in.GymManagementSystem.service.PlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public PlanDTO getPlanById(Long id) {
         Plan plan = planRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
         return convertToDTO(plan);
     }
 
@@ -57,7 +58,7 @@ public class PlanServiceImpl implements PlanService {
     @Transactional
     public PlanDTO updatePlan(Long id, PlanDTO planDTO) {
         Plan plan = planRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
 
         plan.setName(planDTO.getName());
         plan.setDescription(planDTO.getDescription());
