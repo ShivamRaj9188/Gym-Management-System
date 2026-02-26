@@ -1,7 +1,7 @@
 import apiClient from "./api";
 
-export const getTrainers = async () => {
-  const response = await apiClient.get("/trainers");
+export const getTrainers = async (page = 0, size = 10) => {
+  const response = await apiClient.get(`/trainers?page=${page}&size=${size}`);
   return response.data;
 };
 

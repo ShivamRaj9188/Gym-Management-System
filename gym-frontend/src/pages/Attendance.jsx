@@ -37,9 +37,9 @@ function Attendance() {
   const [error, setError] = useState("");
 
   const loadInitialData = async () => {
-    const [attendanceRes, memberRes] = await Promise.all([getAttendance(), getMembers()]);
-    setAttendanceRows(attendanceRes);
-    setMembers(memberRes);
+    const [attendanceRes, memberRes] = await Promise.all([getAttendance(), getMembers(0, 100)]);
+    setAttendanceRows(attendanceRes.content || attendanceRes);
+    setMembers(memberRes.content || memberRes);
   };
 
   useEffect(() => {
@@ -73,7 +73,7 @@ function Attendance() {
       return;
     }
     const data = await getAttendance();
-    setAttendanceRows(data);
+    setAttendanceRows(data.content || data);
   };
 
   const handleCreateAttendance = async e => {
@@ -144,7 +144,7 @@ function Attendance() {
     setMemberFilter("");
     try {
       const data = await getAttendance();
-      setAttendanceRows(data);
+      setAttendanceRows(data.content || data);
     } catch (err) {
       setError(getErrorMessage(err));
     }

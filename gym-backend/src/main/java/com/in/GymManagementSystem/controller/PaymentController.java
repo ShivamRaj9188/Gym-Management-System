@@ -4,6 +4,9 @@ import com.in.GymManagementSystem.dto.PaymentDTO;
 import com.in.GymManagementSystem.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,8 +23,13 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping
-    public ResponseEntity<List<PaymentDTO>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+    public ResponseEntity<Page<PaymentDTO>> getAllPayments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "paymentDate") String sort) {
+        size = Math.min(size, 100);
+        return ResponseEntity
+                .ok(paymentService.getAllPaymentsPaged(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sort))));
     }
 
     @GetMapping("/member/{memberId}")
@@ -40,7 +48,8 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<PaymentDTO> updatePaymentStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<PaymentDTO> updatePaymentStatus(@PathVariable Long id,
+            @RequestBody Map<String, String> request) {
         String status = request.get("status");
         if (status == null || status.trim().isEmpty()) {
             throw new IllegalArgumentException("Payment status is required.");

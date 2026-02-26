@@ -4,12 +4,12 @@ import com.in.GymManagementSystem.dto.MemberDTO;
 import com.in.GymManagementSystem.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/members")
@@ -19,8 +19,12 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping
-    public ResponseEntity<List<MemberDTO>> getAllMembers() {
-        return ResponseEntity.ok(memberService.getAllMembers());
+    public ResponseEntity<Page<MemberDTO>> getAllMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sort) {
+        size = Math.min(size, 100);
+        return ResponseEntity.ok(memberService.getAllMembersPaged(PageRequest.of(page, size, Sort.by(sort))));
     }
 
     @GetMapping("/{id}")

@@ -42,9 +42,9 @@ function PaymentTracking() {
   const [error, setError] = useState("");
 
   const loadInitialData = async () => {
-    const [paymentRes, memberRes, planRes] = await Promise.all([getPayments(), getMembers(), getPlans()]);
-    setPayments(paymentRes);
-    setMembers(memberRes);
+    const [paymentRes, memberRes, planRes] = await Promise.all([getPayments(), getMembers(0, 100), getPlans()]);
+    setPayments(paymentRes.content || paymentRes);
+    setMembers(memberRes.content || memberRes);
     setPlans(planRes);
   };
 
@@ -80,7 +80,7 @@ function PaymentTracking() {
       return;
     }
     const data = await getPayments();
-    setPayments(data);
+    setPayments(data.content || data);
   };
 
   const handleCreatePayment = async e => {
@@ -201,7 +201,7 @@ function PaymentTracking() {
     setMemberFilter("");
     try {
       const data = await getPayments();
-      setPayments(data);
+      setPayments(data.content || data);
     } catch (err) {
       setError(getErrorMessage(err));
     }

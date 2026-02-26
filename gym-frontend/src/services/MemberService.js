@@ -1,7 +1,7 @@
 import apiClient from "./api";
 
-export const getMembers = async () => {
-  const response = await apiClient.get("/members");
+export const getMembers = async (page = 0, size = 10) => {
+  const response = await apiClient.get(`/members?page=${page}&size=${size}`);
   return response.data;
 };
 

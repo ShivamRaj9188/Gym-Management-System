@@ -10,6 +10,7 @@ import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { isAuthenticated } from "./services/AuthService";
 
 function App() {
@@ -56,64 +57,66 @@ function App() {
         <Navbar isLoggedIn={isLoggedIn} />
 
         <main className="mt-3">
-          {!isLoggedIn ? (
-            <section className="alert alert-info border-0 shadow-sm mb-3" role="alert">
-              Login to access all modules: Dashboard, Member Plans, Trainer Assignment, Attendance, and Payments.
-            </section>
-          ) : null}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/members"
-              element={
-                <ProtectedRoute>
-                  <MemberPlans />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/trainers"
-              element={
-                <ProtectedRoute>
-                  <TrainerAssignment />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/attendance"
-              element={
-                <ProtectedRoute>
-                  <Attendance />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/payments"
-              element={
-                <ProtectedRoute>
-                  <PaymentTracking />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/users"
-              element={
-                <ProtectedRoute requireAdmin>
-                  <AdminUsers />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} replace />} />
-          </Routes>
+          <ErrorBoundary>
+            {!isLoggedIn ? (
+              <section className="alert alert-info border-0 shadow-sm mb-3" role="alert">
+                Login to access all modules: Dashboard, Member Plans, Trainer Assignment, Attendance, and Payments.
+              </section>
+            ) : null}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/members"
+                element={
+                  <ProtectedRoute>
+                    <MemberPlans />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/trainers"
+                element={
+                  <ProtectedRoute>
+                    <TrainerAssignment />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/attendance"
+                element={
+                  <ProtectedRoute>
+                    <Attendance />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/payments"
+                element={
+                  <ProtectedRoute>
+                    <PaymentTracking />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminUsers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} replace />} />
+            </Routes>
+          </ErrorBoundary>
         </main>
       </div>
     </div>

@@ -1,49 +1,45 @@
 package com.in.GymManagementSystem.controller;
 
+import com.in.GymManagementSystem.dto.LoginRequest;
+import com.in.GymManagementSystem.dto.SignupRequest;
+import com.in.GymManagementSystem.entity.RefreshToken;
 import com.in.GymManagementSystem.entity.User;
 import com.in.GymManagementSystem.repository.UserRepository;
 import com.in.GymManagementSystem.security.JwtUtil;
+import com.in.GymManagementSystem.service.RefreshTokenService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
+/**
+ * OWASP: Authentication controller with typed DTOs, rate limiting, and refresh
+ * token support.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private static final int MIN_USERNAME_LENGTH = 3;
-    private static final int MAX_USERNAME_LENGTH = 20;
-    private static final int MIN_PASSWORD_LENGTH = 8;
-    private static final int MAX_PASSWORD_LENGTH = 64;
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9._]+$");
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$");
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String password = request.get("password");
-
-        if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Username and password are required"));
-        }
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
+        String username = request.getUsername().trim();
+        String password = request.getPassword();
 
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
@@ -56,6 +52,7 @@ public class AuthController {
                     .body(Map.of("message", "Account is not verified yet"));
         }
 
+        // OWASP: Migrate legacy plain-text passwords to BCrypt on successful match
         if (user.getPassword() != null && !user.getPassword().startsWith("$2")) {
             if (user.getPassword().equals(password)) {
                 user.setPassword(passwordEncoder.encode(password));
@@ -71,28 +68,25 @@ public class AuthController {
 
         String role = user.getRole() == null ? "USER" : user.getRole();
         String token = jwtUtil.generateToken(user.getUsername(), role);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Login successful",
-                "username", user.getUsername(),
-                "role", role,
-                "token", token
-        ));
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("username", user.getUsername());
+        response.put("role", role);
+        response.put("token", token);
+        response.put("refreshToken", refreshToken.getToken());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signup(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String password = request.get("password");
+    public ResponseEntity<Map<String, String>> signup(@Valid @RequestBody SignupRequest request) {
+        String normalizedUsername = request.getUsername().trim();
+        String password = request.getPassword();
 
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Username and password are required"));
-        }
-
-        String normalizedUsername = username.trim();
-        String validationError = validateSignupInput(normalizedUsername, password);
-        if (validationError != null) {
-            return ResponseEntity.badRequest().body(Map.of("message", validationError));
+        if (password.chars().anyMatch(Character::isWhitespace)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Password must not contain spaces"));
         }
 
         Optional<User> existingUser = userRepository.findByUsername(normalizedUsername);
@@ -117,35 +111,80 @@ public class AuthController {
                 "message", "Signup successful",
                 "username", newUser.getUsername(),
                 "role", newUser.getRole(),
-                "verified", String.valueOf(newUser.isVerified())
-        ));
+                "verified", String.valueOf(newUser.isVerified())));
     }
 
-    private String validateSignupInput(String username, String password) {
-        if (username.isBlank() || password.isBlank()) {
-            return "Username and password are required";
+    /**
+     * Refresh access token using a valid refresh token.
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request) {
+        String requestRefreshToken = request.get("refreshToken");
+        if (requestRefreshToken == null || requestRefreshToken.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Refresh token is required"));
         }
 
-        if (username.length() < MIN_USERNAME_LENGTH || username.length() > MAX_USERNAME_LENGTH) {
-            return "Username must be between 3 and 20 characters";
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(token -> {
+                    if (refreshTokenService.isExpired(token)) {
+                        refreshTokenService.deleteByUserId(token.getUser().getId());
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of("message", "Refresh token expired. Please login again."));
+                    }
+
+                    User user = token.getUser();
+                    String role = user.getRole() == null ? "USER" : user.getRole();
+                    String newAccessToken = jwtUtil.generateToken(user.getUsername(), role);
+
+                    Map<String, String> response = new HashMap<>();
+                    response.put("token", newAccessToken);
+                    response.put("refreshToken", requestRefreshToken);
+                    response.put("message", "Token refreshed");
+                    return ResponseEntity.ok(response);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Invalid refresh token")));
+    }
+
+    /**
+     * Admin-only: Reset another user's password.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
+        // Only admin can reset passwords
+        String currentUser;
+        try {
+            currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Unauthorized"));
         }
 
-        if (!USERNAME_PATTERN.matcher(username).matches()) {
-            return "Username can only contain letters, numbers, dot, and underscore";
+        Optional<User> adminUser = userRepository.findByUsername(currentUser);
+        if (adminUser.isEmpty() || !"ADMIN".equalsIgnoreCase(adminUser.get().getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only admins can reset passwords"));
         }
 
-        if (password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
-            return "Password must be between 8 and 64 characters";
+        String targetUsername = request.get("username");
+        String newPassword = request.get("newPassword");
+
+        if (targetUsername == null || newPassword == null || newPassword.length() < 8) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Username and newPassword (min 8 chars) are required"));
         }
 
-        if (password.chars().anyMatch(Character::isWhitespace)) {
-            return "Password must not contain spaces";
+        Optional<User> targetUser = userRepository.findByUsername(targetUsername);
+        if (targetUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
         }
 
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            return "Password must include uppercase, lowercase, number, and special character";
-        }
+        User user = targetUser.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
 
-        return null;
+        // Invalidate existing refresh tokens
+        refreshTokenService.deleteByUserId(user.getId());
+
+        return ResponseEntity.ok(Map.of("message", "Password reset successful for " + targetUsername));
     }
 }

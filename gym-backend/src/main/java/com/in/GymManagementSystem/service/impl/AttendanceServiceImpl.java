@@ -16,6 +16,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @Service
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
@@ -28,6 +31,11 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<AttendanceDTO> getAllAttendancePaged(Pageable pageable) {
+        return attendanceRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     @Override
