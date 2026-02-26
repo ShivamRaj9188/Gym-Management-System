@@ -22,5 +22,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String role; // ADMIN, STAFF
+    private String role; // ADMIN, USER
+
+    private boolean verified;
 }

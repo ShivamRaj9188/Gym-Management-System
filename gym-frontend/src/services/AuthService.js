@@ -30,7 +30,11 @@ export const getStoredUser = () => {
   }
 };
 
-export const isAuthenticated = () => Boolean(getStoredUser());
+export const isAuthenticated = () => Boolean(getStoredUser()?.token);
+
+export const getAuthToken = () => getStoredUser()?.token || "";
+
+export const isAdmin = () => (getStoredUser()?.role || "").toUpperCase() === "ADMIN";
 
 export const logoutUser = () => {
   localStorage.removeItem(AUTH_USER_KEY);

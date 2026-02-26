@@ -19,6 +19,7 @@ const emptyAssignmentForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
+const isValidEmail = email => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 
 function TrainerAssignment() {
   const [trainers, setTrainers] = useState([]);
@@ -68,6 +69,14 @@ function TrainerAssignment() {
 
       if (!payload.name) {
         setError("Trainer name is required.");
+        return;
+      }
+      if (!payload.email) {
+        setError("Trainer email is required.");
+        return;
+      }
+      if (!isValidEmail(payload.email)) {
+        setError("Please enter a valid trainer email.");
         return;
       }
 
@@ -175,6 +184,7 @@ function TrainerAssignment() {
                   <div className="row g-2 mb-3">
                     <div className="col-6">
                       <input
+                        type="email"
                         className="form-control"
                         placeholder="Email"
                         value={trainerForm.email}

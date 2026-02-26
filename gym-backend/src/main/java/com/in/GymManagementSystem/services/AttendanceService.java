@@ -10,4 +10,5 @@ public interface AttendanceService {
     List<AttendanceDTO> getAttendanceByMember(Long memberId);
     AttendanceDTO createAttendance(AttendanceDTO attendanceDTO);
     AttendanceDTO checkOut(Long id);
+    void deleteAttendance(Long id);
 }

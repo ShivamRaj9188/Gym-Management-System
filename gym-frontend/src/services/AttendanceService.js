@@ -24,3 +24,7 @@ export const checkOutAttendance = async id => {
   const response = await apiClient.put(`/attendance/${id}/checkout`);
   return response.data;
 };
+
+export const deleteAttendance = async id => {
+  await apiClient.delete(`/attendance/${id}`);
+};

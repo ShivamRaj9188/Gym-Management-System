@@ -53,6 +53,13 @@ function Navbar({ isLoggedIn }) {
                   Payment Tracking
                 </NavLink>
               </li>
+              {currentUser?.role?.toUpperCase() === "ADMIN" ? (
+                <li className="nav-item">
+                  <NavLink className={getLinkClass} to="/admin/users">
+                    Admin Users
+                  </NavLink>
+                </li>
+              ) : null}
               <li className="nav-item ms-lg-auto d-flex align-items-center px-2 text-secondary">
                 {currentUser?.username}
               </li>

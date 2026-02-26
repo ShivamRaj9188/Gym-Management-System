@@ -2,6 +2,7 @@ package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.dto.PlanDTO;
 import com.in.GymManagementSystem.services.PlanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +34,12 @@ public class PlanController {
     }
 
     @PostMapping
-    public ResponseEntity<PlanDTO> createPlan(@RequestBody PlanDTO planDTO) {
+    public ResponseEntity<PlanDTO> createPlan(@Valid @RequestBody PlanDTO planDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(planService.createPlan(planDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PlanDTO> updatePlan(@PathVariable Long id, @RequestBody PlanDTO planDTO) {
+    public ResponseEntity<PlanDTO> updatePlan(@PathVariable Long id, @Valid @RequestBody PlanDTO planDTO) {
         return ResponseEntity.ok(planService.updatePlan(id, planDTO));
     }
 
