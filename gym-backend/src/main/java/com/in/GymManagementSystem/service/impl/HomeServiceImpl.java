@@ -8,7 +8,7 @@ import com.in.GymManagementSystem.repository.MemberRepository;
 import com.in.GymManagementSystem.repository.TrainerRepository;
 import com.in.GymManagementSystem.repository.AttendanceRepository;
 import com.in.GymManagementSystem.repository.PaymentRepository;
-import com.in.GymManagementSystem.services.HomeService;
+import com.in.GymManagementSystem.service.HomeService;
 
 import java.time.LocalDate;
 

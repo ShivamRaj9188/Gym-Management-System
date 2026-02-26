@@ -4,10 +4,11 @@ import com.in.GymManagementSystem.dto.MemberDTO;
 import com.in.GymManagementSystem.entity.Member;
 import com.in.GymManagementSystem.entity.Plan;
 import com.in.GymManagementSystem.entity.Trainer;
+import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.MemberRepository;
 import com.in.GymManagementSystem.repository.PlanRepository;
 import com.in.GymManagementSystem.repository.TrainerRepository;
-import com.in.GymManagementSystem.services.MemberService;
+import com.in.GymManagementSystem.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDTO getMemberById(Long id) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         return convertToDTO(member);
     }
 
@@ -54,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (memberDTO.getPlanId() != null) {
             Plan plan = planRepository.findById(memberDTO.getPlanId())
-                    .orElseThrow(() -> new RuntimeException("Plan not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
             member.setPlan(plan);
         }
 
@@ -66,7 +67,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberDTO updateMember(Long id, MemberDTO memberDTO) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         String normalizedEmail = normalizeEmail(memberDTO.getEmail());
         String normalizedPhone = normalizePhone(memberDTO.getPhone());
         ensureUniqueMemberContact(normalizedEmail, normalizedPhone, id);
@@ -78,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (memberDTO.getPlanId() != null) {
             Plan plan = planRepository.findById(memberDTO.getPlanId())
-                    .orElseThrow(() -> new RuntimeException("Plan not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
             member.setPlan(plan);
         } else {
             member.setPlan(null);
@@ -97,9 +98,9 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberDTO assignTrainer(Long memberId, Long trainerId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
 
         member.getTrainers().add(trainer);
         member = memberRepository.save(member);
@@ -110,9 +111,9 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberDTO removeTrainer(Long memberId, Long trainerId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
 
         member.getTrainers().remove(trainer);
         member = memberRepository.save(member);

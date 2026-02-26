@@ -12,5 +12,8 @@ dist/
 .idea/
 *.iml
 
+# VS Code
+.vscode/
+
 # Maven
 target/

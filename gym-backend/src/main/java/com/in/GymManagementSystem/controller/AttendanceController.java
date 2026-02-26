@@ -18,14 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.in.GymManagementSystem.dto.AttendanceDTO;
-import com.in.GymManagementSystem.services.AttendanceService;
+import com.in.GymManagementSystem.service.AttendanceService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/attendance")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"})
 @RequiredArgsConstructor
 public class AttendanceController {
 

@@ -4,10 +4,11 @@ import com.in.GymManagementSystem.dto.PaymentDTO;
 import com.in.GymManagementSystem.entity.Member;
 import com.in.GymManagementSystem.entity.Payment;
 import com.in.GymManagementSystem.entity.Plan;
+import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.MemberRepository;
 import com.in.GymManagementSystem.repository.PaymentRepository;
 import com.in.GymManagementSystem.repository.PlanRepository;
-import com.in.GymManagementSystem.services.PaymentService;
+import com.in.GymManagementSystem.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,9 +55,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
         Member member = memberRepository.findById(paymentDTO.getMemberId())
-                .orElseThrow(() -> new RuntimeException("Member not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
         Plan plan = planRepository.findById(paymentDTO.getPlanId())
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
 
         if (paymentDTO.getPaymentDate() == null) {
             throw new IllegalArgumentException("Payment date is required.");
@@ -89,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentDTO updatePaymentStatus(Long id, String status) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (payment.getPaymentDate() != null && payment.getPaymentDate().getYear() < LocalDate.now().getYear()) {
             throw new IllegalArgumentException("Cannot update status for payments from last year.");
@@ -104,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void deletePayment(Long id) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         paymentRepository.delete(payment);
     }
 

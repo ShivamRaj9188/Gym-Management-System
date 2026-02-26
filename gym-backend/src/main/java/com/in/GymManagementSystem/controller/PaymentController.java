@@ -1,7 +1,7 @@
 package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.dto.PaymentDTO;
-import com.in.GymManagementSystem.services.PaymentService;
+import com.in.GymManagementSystem.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payments")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"})
 @RequiredArgsConstructor
 public class PaymentController {
 
