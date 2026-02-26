@@ -19,6 +19,7 @@ It covers member management, trainer assignment, attendance, plans, payments, da
 Gym Mangement system/
 ├── gym-backend/
 ├── gym-frontend/
+├── .gitignore
 ├── PROJECT_REPORT.md
 └── README.md
 ```
@@ -53,14 +54,13 @@ Gym Mangement system/
 ```sql
 CREATE DATABASE testdb;
 ```
-2. Update DB configuration in `gym-backend/src/main/resources/application.yaml`:
-- `spring.datasource.url`
-- `spring.datasource.username`
-- `spring.datasource.password`
+2. Configure DB credentials (choose one):
+- **Environment variables** (recommended): set `DB_USERNAME` and `DB_PASSWORD`
+- **Direct config**: edit `gym-backend/src/main/resources/application.yaml` → `spring.datasource.username` / `password`
 
-3. Set a strong JWT secret in `application.yaml`:
-- `jwt.secret`
-- `jwt.expiration-ms`
+3. Configure JWT secret (choose one):
+- **Environment variable** (recommended): set `JWT_SECRET`
+- **Direct config**: edit `jwt.secret` in `application.yaml`
 
 4. Start backend:
 ```bash
@@ -145,4 +145,4 @@ java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
 - CORS currently allows local frontend ports `5173` and `5174`
 - JWT token is stored in browser `localStorage`
 - API client auto-attaches token and logs user out on `401`
-- `application.yaml` currently contains local DB credentials; move to env variables for deployment
+- DB credentials and JWT secret are configurable via environment variables (`DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`) with local defaults in `application.yaml`
