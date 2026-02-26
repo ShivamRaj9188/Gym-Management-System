@@ -9,4 +9,5 @@ public interface PaymentService {
     List<PaymentDTO> getPaymentsByStatus(String status);
     PaymentDTO createPayment(PaymentDTO paymentDTO);
     PaymentDTO updatePaymentStatus(Long id, String status);
+    void deletePayment(Long id);
 }

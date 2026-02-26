@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getMembers } from "../services/MemberService";
-import { getPayments, getPaymentsByMember, getPaymentsByStatus, createPayment, updatePaymentStatus } from "../services/PaymentService";
+import { getPayments, getPaymentsByMember, getPaymentsByStatus, createPayment, updatePaymentStatus, deletePayment } from "../services/PaymentService";
 import { getPlans } from "../services/PlanService";
+import { isAdmin } from "../services/AuthService";
 
 const emptyPaymentForm = {
   memberId: "",
@@ -14,6 +15,18 @@ const emptyPaymentForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
+const getCurrentYear = () => new Date().getFullYear();
+const isPastYearPayment = dateString => {
+  if (!dateString) return false;
+  const year = new Date(dateString).getFullYear();
+  return year < getCurrentYear();
+};
+const isCurrentYear = dateString => {
+  if (!dateString) return false;
+  return new Date(dateString).getFullYear() === getCurrentYear();
+};
+const getYearStart = () => `${getCurrentYear()}-01-01`;
+const getYearEnd = () => `${getCurrentYear()}-12-31`;
 
 function PaymentTracking() {
   const [payments, setPayments] = useState([]);
@@ -75,6 +88,10 @@ function PaymentTracking() {
         setError("Member, plan, amount, date, and status are required.");
         return;
       }
+      if (!isCurrentYear(form.paymentDate)) {
+        setError("Only current year payments are allowed.");
+        return;
+      }
 
       await createPayment({
         memberId: Number(form.memberId),
@@ -94,11 +111,26 @@ function PaymentTracking() {
     }
   };
 
-  const handleStatusUpdate = async (paymentId, status) => {
+  const handleStatusUpdate = async (payment, status) => {
     clearMessages();
     try {
-      await updatePaymentStatus(paymentId, status);
+      if (isPastYearPayment(payment.paymentDate)) {
+        setError("Cannot update status for last year payments.");
+        return;
+      }
+      await updatePaymentStatus(payment.id, status);
       setMessage("Payment status updated.");
+      await refreshPaymentsWithFilters();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const handleDelete = async id => {
+    clearMessages();
+    try {
+      await deletePayment(id);
+      setMessage("Payment deleted.");
       await refreshPaymentsWithFilters();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -202,6 +234,8 @@ function PaymentTracking() {
                       <input
                         type="date"
                         className="form-control"
+                        min={getYearStart()}
+                        max={getYearEnd()}
                         value={form.paymentDate}
                         onChange={e => setForm(prev => ({ ...prev, paymentDate: e.target.value }))}
                       />
@@ -277,6 +311,7 @@ function PaymentTracking() {
                     <th>Date</th>
                     <th>Status</th>
                     <th>Set Status</th>
+                    {isAdmin() ? <th>Delete</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -291,24 +326,34 @@ function PaymentTracking() {
                         <div className="d-flex gap-1">
                           <button
                             className="btn btn-sm btn-outline-success"
-                            onClick={() => handleStatusUpdate(payment.id, "PAID")}
+                            onClick={() => handleStatusUpdate(payment, "PAID")}
+                            disabled={isPastYearPayment(payment.paymentDate)}
                           >
                             PAID
                           </button>
                           <button
                             className="btn btn-sm btn-outline-warning"
-                            onClick={() => handleStatusUpdate(payment.id, "PENDING")}
+                            onClick={() => handleStatusUpdate(payment, "PENDING")}
+                            disabled={isPastYearPayment(payment.paymentDate)}
                           >
                             PENDING
                           </button>
                           <button
                             className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleStatusUpdate(payment.id, "FAILED")}
+                            onClick={() => handleStatusUpdate(payment, "FAILED")}
+                            disabled={isPastYearPayment(payment.paymentDate)}
                           >
                             FAILED
                           </button>
                         </div>
                       </td>
+                      {isAdmin() ? (
+                        <td>
+                          <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(payment.id)}>
+                            Delete
+                          </button>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

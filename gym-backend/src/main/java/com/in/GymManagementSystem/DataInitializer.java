@@ -11,6 +11,7 @@ import com.in.GymManagementSystem.repository.MemberRepository;
 import com.in.GymManagementSystem.repository.PlanRepository;
 import com.in.GymManagementSystem.repository.TrainerRepository;
 import com.in.GymManagementSystem.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initUsers(
             UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
             PlanRepository planRepository,
             MemberRepository memberRepository,
             TrainerRepository trainerRepository) {
@@ -28,14 +30,16 @@ public class DataInitializer {
             Optional<User> existingAdmin = userRepository.findByUsername("admin");
             if (existingAdmin.isPresent()) {
                 User admin = existingAdmin.get();
-                admin.setPassword("admin123");
+                admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRole("ADMIN");
+                admin.setVerified(true);
                 userRepository.save(admin);
             } else {
                 User admin = User.builder()
                         .username("admin")
-                        .password("admin123")
+                        .password(passwordEncoder.encode("admin123"))
                         .role("ADMIN")
+                        .verified(true)
                         .build();
 
                 userRepository.save(admin);

@@ -24,3 +24,7 @@ export const updatePaymentStatus = async (id, status) => {
   const response = await apiClient.put(`/payments/${id}/status`, { status });
   return response.data;
 };
+
+export const deletePayment = async id => {
+  await apiClient.delete(`/payments/${id}`);
+};

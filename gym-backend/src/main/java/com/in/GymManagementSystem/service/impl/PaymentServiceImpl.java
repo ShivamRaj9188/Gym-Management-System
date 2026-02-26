@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,13 @@ public class PaymentServiceImpl implements PaymentService {
         Plan plan = planRepository.findById(paymentDTO.getPlanId())
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
+        if (paymentDTO.getPaymentDate() == null) {
+            throw new IllegalArgumentException("Payment date is required.");
+        }
+        if (paymentDTO.getPaymentDate().getYear() != LocalDate.now().getYear()) {
+            throw new IllegalArgumentException("Only current year payments are allowed.");
+        }
+
         Payment payment = Payment.builder()
                 .member(member)
                 .plan(plan)
@@ -72,9 +80,21 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
+        if (payment.getPaymentDate() != null && payment.getPaymentDate().getYear() < LocalDate.now().getYear()) {
+            throw new IllegalArgumentException("Cannot update status for payments from last year.");
+        }
+
         payment.setStatus(status);
         payment = paymentRepository.save(payment);
         return convertToDTO(payment);
+    }
+
+    @Override
+    @Transactional
+    public void deletePayment(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+        paymentRepository.delete(payment);
     }
 
     private PaymentDTO convertToDTO(Payment payment) {

@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import {
   checkOutAttendance,
   createAttendance,
+  deleteAttendance,
   getAttendance,
   getAttendanceByDate,
   getAttendanceByMember,
 } from "../services/AttendanceService";
 import { getMembers } from "../services/MemberService";
+import { isAdmin } from "../services/AuthService";
 
 const emptyAttendanceForm = {
   memberId: "",
@@ -15,6 +17,14 @@ const emptyAttendanceForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
+const getTodayString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+const isBeforeToday = dateString => dateString && dateString < getTodayString();
 
 function Attendance() {
   const [attendanceRows, setAttendanceRows] = useState([]);
@@ -74,6 +84,10 @@ function Attendance() {
         setError("Please select a member.");
         return;
       }
+      if (form.date && isBeforeToday(form.date)) {
+        setError("Attendance cannot be marked for past dates.");
+        return;
+      }
 
       await createAttendance({
         memberId: Number(form.memberId),
@@ -89,11 +103,26 @@ function Attendance() {
     }
   };
 
-  const handleCheckOut = async id => {
+  const handleCheckOut = async row => {
     clearMessages();
     try {
-      await checkOutAttendance(id);
+      if (row.date && isBeforeToday(row.date)) {
+        setError("Attendance checkout is only allowed for today.");
+        return;
+      }
+      await checkOutAttendance(row.id);
       setMessage("Checkout time updated.");
+      await refreshAttendanceWithFilters();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const handleDelete = async id => {
+    clearMessages();
+    try {
+      await deleteAttendance(id);
+      setMessage("Attendance deleted.");
       await refreshAttendanceWithFilters();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -161,6 +190,7 @@ function Attendance() {
                       <input
                         type="date"
                         className="form-control"
+                        min={getTodayString()}
                         value={form.date}
                         onChange={e => setForm(prev => ({ ...prev, date: e.target.value }))}
                       />
@@ -220,6 +250,7 @@ function Attendance() {
                     <th>Check In</th>
                     <th>Check Out</th>
                     <th>Action</th>
+                    {isAdmin() ? <th>Delete</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -233,11 +264,22 @@ function Attendance() {
                         {row.checkOut ? (
                           <span className="badge text-bg-success">Completed</span>
                         ) : (
-                          <button className="btn btn-sm btn-outline-warning" onClick={() => handleCheckOut(row.id)}>
+                          <button
+                            className="btn btn-sm btn-outline-warning"
+                            onClick={() => handleCheckOut(row)}
+                            disabled={isBeforeToday(row.date)}
+                          >
                             Check Out
                           </button>
                         )}
                       </td>
+                      {isAdmin() ? (
+                        <td>
+                          <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(row.id)}>
+                            Delete
+                          </button>
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

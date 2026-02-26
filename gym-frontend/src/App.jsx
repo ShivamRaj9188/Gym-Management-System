@@ -6,6 +6,7 @@ import MemberPlans from "./pages/MemberPlans";
 import TrainerAssignment from "./pages/TrainerAssignment";
 import Attendance from "./pages/Attendance";
 import PaymentTracking from "./pages/PaymentTracking";
+import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -25,12 +26,30 @@ function App() {
   }, []);
 
   return (
-    <div className="container-fluid min-vh-100 bg-light py-4">
+    <div className="container-fluid min-vh-100 py-4 app-shell">
       <div className="container">
-        <header className="card border-0 shadow-sm bg-dark text-white mb-3">
+        <header className="card border-0 text-white mb-3 hero-card">
           <div className="card-body p-4">
-            <h1 className="h2 mb-2">Gym Management System</h1>
-            <p className="mb-0 text-white-50">Track members, staff, attendance, and payments in one place.</p>
+            <div className="row align-items-center g-3">
+              <div className="col-12 col-lg-7">
+                <p className="text-uppercase text-white-50 small mb-2">Operational Command Center</p>
+                <h1 className="display-6 fw-bold mb-2">Gym Management System</h1>
+                <p className="mb-3 text-white-50">
+                  Run memberships, trainers, attendance, and payments with a single high-performance dashboard.
+                </p>
+                <div className="d-flex flex-wrap gap-2">
+                  <span className="badge text-bg-dark border border-light-subtle">Live Attendance</span>
+                  <span className="badge text-bg-dark border border-light-subtle">Revenue Tracking</span>
+                  <span className="badge text-bg-dark border border-light-subtle">Member Insights</span>
+                </div>
+              </div>
+              <div className="col-12 col-lg-5 text-lg-end">
+                <div className="d-inline-flex flex-column gap-2">
+                  <span className="text-white-50 small">Peak Performance Mode</span>
+                  <span className="h1 fw-bold text-white">24/7</span>
+                </div>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -80,6 +99,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PaymentTracking />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <AdminUsers />
                 </ProtectedRoute>
               }
             />

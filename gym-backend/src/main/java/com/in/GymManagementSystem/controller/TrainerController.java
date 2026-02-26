@@ -2,6 +2,7 @@ package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.dto.TrainerDTO;
 import com.in.GymManagementSystem.services.TrainerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +29,12 @@ public class TrainerController {
     }
 
     @PostMapping
-    public ResponseEntity<TrainerDTO> createTrainer(@RequestBody TrainerDTO trainerDTO) {
+    public ResponseEntity<TrainerDTO> createTrainer(@Valid @RequestBody TrainerDTO trainerDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(trainerService.createTrainer(trainerDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TrainerDTO> updateTrainer(@PathVariable Long id, @RequestBody TrainerDTO trainerDTO) {
+    public ResponseEntity<TrainerDTO> updateTrainer(@PathVariable Long id, @Valid @RequestBody TrainerDTO trainerDTO) {
         return ResponseEntity.ok(trainerService.updateTrainer(id, trainerDTO));
     }
 

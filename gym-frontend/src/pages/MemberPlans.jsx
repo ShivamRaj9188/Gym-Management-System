@@ -19,6 +19,7 @@ const emptyMemberForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
+const isValidEmail = email => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 
 function MemberPlans() {
   const [plans, setPlans] = useState([]);
@@ -131,6 +132,14 @@ function MemberPlans() {
 
       if (!payload.name) {
         setError("Member name is required.");
+        return;
+      }
+      if (!payload.email) {
+        setError("Member email is required.");
+        return;
+      }
+      if (!isValidEmail(payload.email)) {
+        setError("Please enter a valid member email.");
         return;
       }
 
@@ -313,6 +322,7 @@ function MemberPlans() {
                   <div className="row g-2 mb-2">
                     <div className="col-6">
                       <input
+                        type="email"
                         className="form-control"
                         placeholder="Email"
                         value={memberForm.email}

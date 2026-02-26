@@ -49,9 +49,14 @@ public class AttendanceServiceImpl implements AttendanceService {
         Member member = memberRepository.findById(attendanceDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
+        LocalDate attendanceDate = attendanceDTO.getDate() != null ? attendanceDTO.getDate() : LocalDate.now();
+        if (attendanceDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Attendance cannot be marked for past dates.");
+        }
+
         Attendance attendance = Attendance.builder()
                 .member(member)
-                .date(attendanceDTO.getDate() != null ? attendanceDTO.getDate() : LocalDate.now())
+                .date(attendanceDate)
                 .checkIn(attendanceDTO.getCheckIn() != null ? attendanceDTO.getCheckIn() : LocalTime.now())
                 .checkOut(attendanceDTO.getCheckOut())
                 .build();
@@ -66,9 +71,21 @@ public class AttendanceServiceImpl implements AttendanceService {
         Attendance attendance = attendanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Attendance record not found"));
 
+        if (attendance.getDate() != null && attendance.getDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Attendance checkout is only allowed for today.");
+        }
+
         attendance.setCheckOut(LocalTime.now());
         attendance = attendanceRepository.save(attendance);
         return convertToDTO(attendance);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAttendance(Long id) {
+        Attendance attendance = attendanceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Attendance record not found"));
+        attendanceRepository.delete(attendance);
     }
 
     private AttendanceDTO convertToDTO(Attendance attendance) {

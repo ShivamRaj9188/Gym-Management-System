@@ -2,9 +2,13 @@ package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.entity.User;
 import com.in.GymManagementSystem.repository.UserRepository;
+import com.in.GymManagementSystem.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +33,9 @@ public class AuthController {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$");
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
@@ -39,15 +46,39 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "Username and password are required"));
         }
 
-        return userRepository.findByUsername(username)
-                .filter(user -> user.getPassword().equals(password))
-                .map(user -> ResponseEntity.ok(Map.of(
-                        "message", "Login successful",
-                        "username", user.getUsername(),
-                        "role", user.getRole() == null ? "" : user.getRole()
-                )))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("message", "Invalid credentials")));
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid credentials"));
+        }
+
+        User user = userOptional.get();
+        if (!"ADMIN".equalsIgnoreCase(user.getRole()) && !user.isVerified()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Account is not verified yet"));
+        }
+
+        if (user.getPassword() != null && !user.getPassword().startsWith("$2")) {
+            if (user.getPassword().equals(password)) {
+                user.setPassword(passwordEncoder.encode(password));
+                userRepository.save(user);
+            }
+        }
+
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid credentials"));
+        }
+
+        String role = user.getRole() == null ? "USER" : user.getRole();
+        String token = jwtUtil.generateToken(user.getUsername(), role);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Login successful",
+                "username", user.getUsername(),
+                "role", role,
+                "token", token
+        ));
     }
 
     @PostMapping("/signup")
@@ -70,10 +101,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Username already exists"));
         }
 
+        if ("admin".equalsIgnoreCase(normalizedUsername)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Username already exists"));
+        }
+
         User newUser = User.builder()
                 .username(normalizedUsername)
-                .password(password)
-                .role("STAFF")
+                .password(passwordEncoder.encode(password))
+                .role("USER")
+                .verified(false)
                 .build();
 
         userRepository.save(newUser);
@@ -81,7 +117,8 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                 "message", "Signup successful",
                 "username", newUser.getUsername(),
-                "role", newUser.getRole()
+                "role", newUser.getRole(),
+                "verified", String.valueOf(newUser.isVerified())
         ));
     }
 

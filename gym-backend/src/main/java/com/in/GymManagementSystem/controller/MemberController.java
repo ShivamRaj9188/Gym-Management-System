@@ -2,6 +2,7 @@ package com.in.GymManagementSystem.controller;
 
 import com.in.GymManagementSystem.dto.MemberDTO;
 import com.in.GymManagementSystem.services.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +30,12 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberDTO> createMember(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<MemberDTO> createMember(@Valid @RequestBody MemberDTO memberDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(memberDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MemberDTO> updateMember(@PathVariable Long id, @RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<MemberDTO> updateMember(@PathVariable Long id, @Valid @RequestBody MemberDTO memberDTO) {
         return ResponseEntity.ok(memberService.updateMember(id, memberDTO));
     }
 
