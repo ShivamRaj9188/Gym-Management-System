@@ -52,6 +52,8 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 - PostgreSQL JDBC driver
 - Lombok
 
+> Note: Thymeleaf is not used — the backend is a pure REST API.
+
 ### Frontend
 - React 19
 - React Router DOM
@@ -208,11 +210,10 @@ Runs on: `http://localhost:5173`
 - Automated unit and integration coverage is still pending.
 
 ## 14. Current Limitations / Risks
-- JWT secret is static in local config and must be externalized for production.
 - No refresh token implementation.
 - No pagination on list-heavy endpoints.
 - No audit trail for sensitive admin operations.
-- Environment credentials are present in local config file.
+- DB credentials and JWT secret have local defaults in `application.yaml`; for production, override via environment variables (`DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`).
 
 ## 15. Future Enhancements
 - Add refresh-token flow and secure token rotation.
