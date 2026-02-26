@@ -1,8 +1,10 @@
 import axios from "axios";
 import { getAuthToken, getStoredUser, logoutUser } from "./AuthService";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:9999/api";
+
 const apiClient = axios.create({
-  baseURL: "http://localhost:9999/api",
+  baseURL: API_BASE,
 });
 
 apiClient.interceptors.request.use(config => {
@@ -52,7 +54,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.post("http://localhost:9999/api/auth/refresh", {
+        const response = await axios.post(`${API_BASE}/auth/refresh`, {
           refreshToken,
         });
 
