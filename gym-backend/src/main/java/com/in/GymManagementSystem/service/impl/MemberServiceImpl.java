@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,10 +41,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public MemberDTO createMember(MemberDTO memberDTO) {
+        String normalizedEmail = normalizeEmail(memberDTO.getEmail());
+        String normalizedPhone = normalizePhone(memberDTO.getPhone());
+        ensureUniqueMemberContact(normalizedEmail, normalizedPhone, null);
+
         Member member = Member.builder()
                 .name(memberDTO.getName())
-                .email(memberDTO.getEmail())
-                .phone(memberDTO.getPhone())
+                .email(normalizedEmail)
+                .phone(normalizedPhone)
                 .active(memberDTO.isActive())
                 .build();
 
@@ -62,10 +67,13 @@ public class MemberServiceImpl implements MemberService {
     public MemberDTO updateMember(Long id, MemberDTO memberDTO) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
+        String normalizedEmail = normalizeEmail(memberDTO.getEmail());
+        String normalizedPhone = normalizePhone(memberDTO.getPhone());
+        ensureUniqueMemberContact(normalizedEmail, normalizedPhone, id);
 
         member.setName(memberDTO.getName());
-        member.setEmail(memberDTO.getEmail());
-        member.setPhone(memberDTO.getPhone());
+        member.setEmail(normalizedEmail);
+        member.setPhone(normalizedPhone);
         member.setActive(memberDTO.isActive());
 
         if (memberDTO.getPlanId() != null) {
@@ -121,5 +129,29 @@ public class MemberServiceImpl implements MemberService {
                 .planName(member.getPlan() != null ? member.getPlan().getName() : null)
                 .active(member.isActive())
                 .build();
+    }
+
+    private void ensureUniqueMemberContact(String email, String phone, Long currentId) {
+        boolean emailExists = currentId == null
+                ? memberRepository.existsByEmailIgnoreCase(email)
+                : memberRepository.existsByEmailIgnoreCaseAndIdNot(email, currentId);
+        if (emailExists) {
+            throw new IllegalArgumentException("Member email already exists.");
+        }
+
+        boolean phoneExists = currentId == null
+                ? memberRepository.existsByPhone(phone)
+                : memberRepository.existsByPhoneAndIdNot(phone, currentId);
+        if (phoneExists) {
+            throw new IllegalArgumentException("Member phone already exists.");
+        }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizePhone(String phone) {
+        return phone == null ? null : phone.trim();
     }
 }

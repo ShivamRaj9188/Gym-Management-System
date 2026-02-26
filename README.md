@@ -70,6 +70,20 @@ cd gym-backend
 
 Backend URL: `http://localhost:9999`
 
+### Database Alignment Migration (auto-runs)
+
+This repo includes an idempotent alignment script at:
+- `gym-backend/src/main/resources/db/schema-alignment.sql`
+
+It runs automatically on backend startup (configured in `application.yaml`) and keeps DB schema/data aligned with validations:
+- drops legacy `member.plan_type` if present
+- normalizes/repairs invalid member/trainer email/phone data for old databases
+- enforces `NOT NULL` for required member/trainer fields
+- creates unique indexes for member/trainer `email` and `phone`
+- adds payment check constraints for valid status/method and due-date consistency
+
+So after cloning and running backend, a fresh or older DB is aligned automatically.
+
 ## Seeded Data
 
 On startup, the app seeds default data:

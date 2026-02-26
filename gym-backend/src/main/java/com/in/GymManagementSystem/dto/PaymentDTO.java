@@ -2,7 +2,9 @@ package com.in.GymManagementSystem.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import com.in.GymManagementSystem.validation.ValidationPatterns;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -25,7 +27,9 @@ public class PaymentDTO {
     @NotNull(message = "Payment date is required.")
     private LocalDate paymentDate;
     @NotBlank(message = "Payment status is required.")
+    @Pattern(regexp = ValidationPatterns.PAYMENT_STATUS_REGEX, message = "Payment status must be one of: PENDING, PAID, FAILED.")
     private String status;
+    @Pattern(regexp = ValidationPatterns.PAYMENT_METHOD_REGEX, message = "Payment method must be one of: CASH, CARD, UPI.")
     private String paymentMethod;
     private LocalDate dueDate;
 }

@@ -53,6 +53,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (attendanceDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Attendance cannot be marked for past dates.");
         }
+        if (attendanceRepository.existsByMemberIdAndDate(attendanceDTO.getMemberId(), attendanceDate)) {
+            throw new IllegalArgumentException("Attendance for this member and date already exists.");
+        }
 
         Attendance attendance = Attendance.builder()
                 .member(member)
@@ -73,6 +76,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         if (attendance.getDate() != null && attendance.getDate().isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Attendance checkout is only allowed for today.");
+        }
+        if (attendance.getCheckOut() != null) {
+            throw new IllegalArgumentException("Attendance already checked out.");
         }
 
         attendance.setCheckOut(LocalTime.now());

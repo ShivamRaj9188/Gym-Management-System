@@ -14,11 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+    private static final Set<String> ALLOWED_STATUSES = Set.of("PENDING", "PAID", "FAILED");
+    private static final Set<String> ALLOWED_PAYMENT_METHODS = Set.of("CASH", "CARD", "UPI");
 
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
@@ -40,7 +44,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDTO> getPaymentsByStatus(String status) {
-        return paymentRepository.findByStatus(status).stream()
+        String normalizedStatus = normalizeStatus(status);
+        return paymentRepository.findByStatus(normalizedStatus).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -59,14 +64,20 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentDTO.getPaymentDate().getYear() != LocalDate.now().getYear()) {
             throw new IllegalArgumentException("Only current year payments are allowed.");
         }
+        if (paymentDTO.getDueDate() != null && paymentDTO.getDueDate().isBefore(paymentDTO.getPaymentDate())) {
+            throw new IllegalArgumentException("Due date cannot be before payment date.");
+        }
+        if (paymentDTO.getAmount() == null || paymentDTO.getAmount() < plan.getPrice()) {
+            throw new IllegalArgumentException("Payment amount cannot be less than selected plan price.");
+        }
 
         Payment payment = Payment.builder()
                 .member(member)
                 .plan(plan)
                 .amount(paymentDTO.getAmount())
                 .paymentDate(paymentDTO.getPaymentDate())
-                .status(paymentDTO.getStatus())
-                .paymentMethod(paymentDTO.getPaymentMethod())
+                .status(normalizeStatus(paymentDTO.getStatus()))
+                .paymentMethod(normalizePaymentMethod(paymentDTO.getPaymentMethod()))
                 .dueDate(paymentDTO.getDueDate())
                 .build();
 
@@ -84,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("Cannot update status for payments from last year.");
         }
 
-        payment.setStatus(status);
+        payment.setStatus(normalizeStatus(status));
         payment = paymentRepository.save(payment);
         return convertToDTO(payment);
     }
@@ -110,5 +121,29 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentMethod(payment.getPaymentMethod())
                 .dueDate(payment.getDueDate())
                 .build();
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Payment status is required.");
+        }
+
+        String normalized = status.trim().toUpperCase(Locale.ROOT);
+        if (!ALLOWED_STATUSES.contains(normalized)) {
+            throw new IllegalArgumentException("Payment status must be one of: PENDING, PAID, FAILED.");
+        }
+        return normalized;
+    }
+
+    private String normalizePaymentMethod(String paymentMethod) {
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            return null;
+        }
+
+        String normalized = paymentMethod.trim().toUpperCase(Locale.ROOT);
+        if (!ALLOWED_PAYMENT_METHODS.contains(normalized)) {
+            throw new IllegalArgumentException("Payment method must be one of: CASH, CARD, UPI.");
+        }
+        return normalized;
     }
 }
