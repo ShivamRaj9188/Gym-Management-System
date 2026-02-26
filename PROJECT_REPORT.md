@@ -1,50 +1,55 @@
 # Gym Management System - Project Report
 
 ## 1. Project Overview
-The Gym Management System is a full-stack web application built to digitize daily gym operations such as member management, plan management, trainer assignment, attendance tracking, payment tracking, and dashboard reporting.
+The Gym Management System is a full-stack web application to digitize gym operations including member lifecycle management, subscription plans, trainer assignment, attendance logging, payment tracking, and operational dashboard analytics.
 
-The solution consists of:
-- Backend REST API (`gym-backend`) using Spring Boot and PostgreSQL
-- Frontend client (`gym-frontend`) using React + Vite + Axios
+The solution is composed of:
+- Backend REST API (`gym-backend`) built with Spring Boot + PostgreSQL
+- Frontend SPA (`gym-frontend`) built with React + Vite + Axios
 
 ## 2. Problem Statement
-Traditional gym workflows are often handled through registers, spreadsheets, and disconnected tools. This project addresses those issues by providing a centralized system for:
-- Maintaining member and trainer records
-- Managing subscription plans
-- Recording daily attendance
-- Tracking payment status and revenue
-- Monitoring key gym metrics from a dashboard
+Many gyms rely on manual registers and disconnected tools, creating data inconsistency and operational delays. This project centralizes core workflows into one platform for:
+- User access control and onboarding
+- Member and trainer administration
+- Plan mapping and fee management
+- Attendance and payment visibility
+- Admin monitoring through dashboard KPIs
 
 ## 3. Objectives
-- Provide a clean CRUD interface for core gym entities.
-- Maintain relationships between members, trainers, plans, attendance, and payments.
-- Offer quick operational visibility through a dashboard.
-- Include basic authentication for protected access.
+- Deliver secure API-first gym operations with modular frontend screens.
+- Enforce authenticated access across all business modules.
+- Provide role-based control for admin-only user verification workflows.
+- Maintain clean relationships between members, plans, trainers, attendance, and payments.
+- Offer fast operational insight with real-time dashboard summaries.
 
 ## 4. Scope of the Project
 ### In Scope
-- User login/signup (basic authentication)
-- Plan and member management
-- Trainer management and assignment to members
-- Attendance check-in and check-out flow
-- Payment creation, filtering, and status updates
-- Dashboard KPIs (members, trainers, attendance, paid revenue)
+- JWT-based login/signup flow
+- Role-aware route and API protection
+- Admin user management (verify/unverify/delete non-admin users)
+- Plan, member, and trainer CRUD workflows
+- Trainer-to-member assignment management
+- Attendance check-in/check-out workflows
+- Payment create/filter/status-update workflows
+- Dashboard KPIs: members, trainers, attendance, paid revenue
 
 ### Out of Scope (Current Version)
-- JWT/session-based secure authentication
-- Role-based authorization enforcement
-- Advanced reporting exports (PDF/Excel)
-- Notification/reminder workflows
-- Audit logs and full test automation coverage
+- Refresh tokens and token revocation strategy
+- Granular RBAC beyond current ADMIN/USER pattern
+- Reporting exports (PDF/Excel)
+- Notification/reminder engine
+- Full automated test suite and CI/CD automation
 
 ## 5. Technology Stack
 ### Backend
 - Java 17
-- Spring Boot 3.5.x
+- Spring Boot 3.5.10
 - Spring Data JPA
 - Spring Validation
+- Spring Security
+- JWT (`io.jsonwebtoken:jjwt`)
 - Maven
-- PostgreSQL JDBC Driver
+- PostgreSQL JDBC driver
 - Lombok
 
 ### Frontend
@@ -52,79 +57,93 @@ Traditional gym workflows are often handled through registers, spreadsheets, and
 - React Router DOM
 - Axios
 - Vite
-- Bootstrap 5 (via CDN)
+- Bootstrap 5 (CDN)
 
 ### Database
-- PostgreSQL (`testdb` in current local setup)
+- PostgreSQL (`testdb` in local setup)
 
 ## 6. System Architecture
-The project follows a layered architecture:
-- Controller Layer: Exposes REST endpoints and request handling.
-- Service Layer: Contains business logic.
-- Repository Layer: Handles persistence with Spring Data JPA.
-- Entity/DTO Layer: Entity mapping and API payload shaping.
-- Frontend UI Layer: React pages + services to consume backend APIs.
+The application follows a layered architecture:
+- Controller Layer: request handling and endpoint exposure
+- Service Layer: business logic and orchestration
+- Repository Layer: persistence via Spring Data JPA
+- DTO/Entity Layer: API contracts and relational modeling
+- Frontend Layer: page modules + service clients
 
-High-level flow:
+Request flow:
 1. User action in React UI.
-2. Axios service calls backend endpoint.
-3. Controller delegates to service.
-4. Service performs business logic and repository operations.
-5. Response DTOs are returned to frontend and rendered.
+2. Axios sends request to backend.
+3. JWT is attached via Axios interceptor.
+4. Spring Security validates token and role.
+5. Controller delegates to service + repository.
+6. DTO response is returned and rendered.
 
 ## 7. Module-wise Implementation
-### 7.1 Authentication Module
-- Endpoints: `POST /api/auth/login`, `POST /api/auth/signup`
-- Implements username/password validation on signup.
-- Stores authenticated user info in browser `localStorage`.
-- Uses route guards (`ProtectedRoute`) on frontend.
+### 7.1 Authentication & Security Module
+- Public endpoints: `POST /api/auth/login`, `POST /api/auth/signup`
+- Signup validation rules include:
+  - Username length and allowed characters
+  - Password length
+  - Password complexity (upper/lower/number/special char)
+  - No whitespace in password
+- Password storage with BCrypt hashing
+- JWT token generation includes username and role claims
+- Stateless security (`SessionCreationPolicy.STATELESS`)
+- Legacy plain-text passwords are migrated to BCrypt on successful login
 
-### 7.2 Dashboard Module
+### 7.2 Admin User Management Module
+- Protected endpoints under `/api/admin/users`
+- Access restricted to `ROLE_ADMIN`
+- Features:
+  - List all users
+  - Verify/unverify non-admin users
+  - Delete non-admin users
+- New users are created with `verified=false`; verification is required before login
+
+### 7.3 Dashboard Module
 - Endpoint: `GET /api/home/dashboard`
 - Displays:
   - Total members
   - Active members
   - Total trainers
-  - Today attendance count
-  - Total paid revenue (sum of payments with status `PAID`)
+  - Attendance count
+  - Total paid revenue (`PAID` payments)
 
-### 7.3 Member & Plan Module
+### 7.4 Member & Plan Module
 - Plan CRUD: `/api/plans`
 - Member CRUD: `/api/members`
-- Members can be linked/unlinked with plans.
-- Member status tracking (`active` flag).
+- Member-plan mapping support
+- Member active/inactive tracking
 
-### 7.4 Trainer Assignment Module
+### 7.5 Trainer Assignment Module
 - Trainer CRUD: `/api/trainers`
-- Member-trainer mapping:
-  - Assign: `POST /api/members/{memberId}/trainers/{trainerId}`
-  - Remove: `DELETE /api/members/{memberId}/trainers/{trainerId}`
+- Assign trainer: `POST /api/members/{memberId}/trainers/{trainerId}`
+- Remove trainer: `DELETE /api/members/{memberId}/trainers/{trainerId}`
 
-### 7.5 Attendance Module
+### 7.6 Attendance Module
 - Endpoints under `/api/attendance`
 - Features:
   - Mark attendance (check-in)
-  - Update check-out time
-  - Filter attendance by member or date
-- Default behavior:
-  - If date/check-in is not provided, backend uses current date/time
+  - Update checkout
+  - Filter by member/date
+- Backend auto-fills current date/time when missing
 
-### 7.6 Payment Tracking Module
+### 7.7 Payment Tracking Module
 - Endpoints under `/api/payments`
 - Features:
-  - Create payment records
+  - Create payment entries
   - Filter by member and status
   - Update payment status
-- Revenue in dashboard is calculated only from `PAID` payments.
+- Revenue KPI counts only entries with `PAID` status
 
 ## 8. Data Model Summary
-Core entities in backend:
-- `User`: username, password, role
+Core entities:
+- `User`: id, username, password, role, verified
 - `Plan`: name, description, durationMonths, price, active
-- `Member`: name, contact info, active, linked plan
-- `Trainer`: name, specialization, contact info
+- `Member`: profile info, active, linked plan
+- `Trainer`: profile info, specialization
 - `Attendance`: member, date, checkIn, checkOut
-- `Payment`: member, plan, amount, paymentDate, status, paymentMethod, dueDate
+- `Payment`: member, plan, amount, status, paymentDate, paymentMethod, dueDate
 
 Relationships:
 - Member -> Plan: Many-to-One
@@ -135,6 +154,7 @@ Relationships:
 
 ## 9. API Endpoint Summary
 - Auth: `/api/auth/*`
+- Admin Users: `/api/admin/users/*`
 - Dashboard: `/api/home/dashboard`
 - Members: `/api/members/*`
 - Trainers: `/api/trainers/*`
@@ -143,22 +163,24 @@ Relationships:
 - Payments: `/api/payments/*`
 
 ## 10. Frontend Features and UX
-- Route-based navigation with protected routes.
-- Unified module pages:
+- Protected route handling with optional admin gating
+- Auth state synchronized via browser events
+- Token-aware Axios client with auto-logout on `401`
+- Unified module screens:
   - Dashboard
   - Member Plans
   - Trainer Assignment
   - Attendance
   - Payment Tracking
+  - Admin Users (admin-only)
   - Login/Signup
-- Form validation and API error messages shown in alert cards.
-- Loading states and success/error feedback included in module pages.
+- Validation and API feedback shown through alert messaging
 
 ## 11. Seed Data and Initialization
-At backend startup, `DataInitializer` seeds:
-- Admin user: `admin` / `admin123`
+At startup, `DataInitializer` seeds:
+- Admin user: `admin` / `admin123` (role `ADMIN`, verified)
 - Default plans: Basic, Premium, Elite
-- Default trainers: two sample trainers
+- Default trainers: John Smith, Sarah Johnson
 
 ## 12. Build and Run Instructions
 ### Backend
@@ -177,31 +199,29 @@ npm run dev
 Runs on: `http://localhost:5173`
 
 ### Database
-- Create PostgreSQL database (example): `testdb`
+- Create PostgreSQL database: `testdb`
 - Configure datasource in `gym-backend/src/main/resources/application.yaml`
 
 ## 13. Testing Status
-- Backend includes minimal test scaffold (`GymManagementSystemApplicationTests`).
-- No substantial automated unit/integration test suite is currently implemented.
-- Current validation is primarily through runtime behavior and frontend form checks.
+- Backend has only base scaffold test class (`GymManagementSystemApplicationTests`).
+- Major business modules currently rely on manual functional validation.
+- Automated unit and integration coverage is still pending.
 
 ## 14. Current Limitations / Risks
-- Authentication uses plain password comparison and no token mechanism.
-- Passwords are stored in plain text (not hashed).
-- No backend role-based authorization despite role field presence.
-- Limited centralized exception handling (runtime exceptions may surface directly).
-- No pagination for list endpoints (can impact performance with large datasets).
-- Local environment-specific configuration is directly present in application config.
+- JWT secret is static in local config and must be externalized for production.
+- No refresh token implementation.
+- No pagination on list-heavy endpoints.
+- No audit trail for sensitive admin operations.
+- Environment credentials are present in local config file.
 
 ## 15. Future Enhancements
-- Implement Spring Security with BCrypt + JWT authentication.
-- Add role-based access control (ADMIN/STAFF policies).
-- Add global exception handling and standardized API error responses.
-- Introduce pagination, sorting, and advanced filtering.
-- Add reporting exports (PDF/Excel) and analytics trends.
-- Add reminders for expiring plans and overdue payments.
-- Add comprehensive unit/integration tests and CI pipeline.
-- Containerize deployment using Docker and environment-based configs.
+- Add refresh-token flow and secure token rotation.
+- Introduce fine-grained role/permission model.
+- Add pagination, sorting, and richer filters.
+- Add exportable reports and trend analytics.
+- Add reminders for expiring plans and overdue dues.
+- Add unit/integration tests with CI pipeline.
+- Introduce Docker-based deployment with env-based secrets.
 
 ## 16. Conclusion
-This project successfully delivers a practical gym operations platform with all key foundational modules integrated in a single full-stack system. It is suitable for small-to-medium gym workflows in its current form and provides a strong base for production-grade enhancements in security, scalability, and automated testing.
+The current version delivers a robust gym operations platform with secured API access, admin-controlled user activation, and complete foundational business modules. It is well-positioned for production hardening through enhanced token strategy, testing automation, and deployment standardization.

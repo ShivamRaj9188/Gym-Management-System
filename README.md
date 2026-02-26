@@ -1,16 +1,16 @@
 # Gym Management System
 
-Full-stack gym operations app with:
+Full-stack gym operations platform with:
 - Spring Boot REST API (`gym-backend`)
 - React + Vite frontend (`gym-frontend`)
 - PostgreSQL database
 
-It covers member management, trainer assignment, attendance, plans, payments, and a dashboard.
+It covers member management, trainer assignment, attendance, plans, payments, dashboard analytics, and admin-controlled user verification.
 
 ## Tech Stack
 
-- Backend: Java 17, Spring Boot, Spring Data JPA, Maven
-- Frontend: React, React Router, Axios, Vite
+- Backend: Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA, Maven, JWT (`jjwt`)
+- Frontend: React 19, React Router, Axios, Vite, Bootstrap 5
 - Database: PostgreSQL
 
 ## Project Structure
@@ -19,17 +19,27 @@ It covers member management, trainer assignment, attendance, plans, payments, an
 Gym Mangement system/
 ├── gym-backend/
 ├── gym-frontend/
+├── PROJECT_REPORT.md
 └── README.md
 ```
 
-## Features
+## Core Features
 
-- Dashboard: total members, active members, trainers, attendance, revenue
-- Member management: create/update/delete members and link plans
-- Trainer assignment: manage trainers and assign/unassign to members
-- Attendance tracking: check-in/check-out and date/member views
-- Payment tracking: record payments and update status
-- Basic auth module: login/signup for app access
+- JWT Authentication: login/signup with token-based access control
+- User Verification Flow: new non-admin users require admin verification before login
+- Admin User Management: list users, verify/unverify users, delete non-admin users
+- Dashboard: total members, active members, trainers, attendance count, paid revenue
+- Member + Plan Management: CRUD operations and member-plan linking
+- Trainer Assignment: assign/unassign trainers to members
+- Attendance Tracking: mark check-in/check-out and filter by member/date
+- Payment Tracking: add payments, filter status/member, update payment status
+
+## Authentication and Authorization
+
+- Auth endpoints are public: `/api/auth/**`
+- All other APIs require `Authorization: Bearer <jwt>`
+- Admin APIs (`/api/admin/**`) require `ROLE_ADMIN`
+- Frontend route guard supports both authenticated and admin-only routes (`ProtectedRoute`)
 
 ## Prerequisites
 
@@ -43,8 +53,16 @@ Gym Mangement system/
 ```sql
 CREATE DATABASE testdb;
 ```
-2. Update `gym-backend/src/main/resources/application.yaml` with your local DB credentials.
-3. Start backend:
+2. Update DB configuration in `gym-backend/src/main/resources/application.yaml`:
+- `spring.datasource.url`
+- `spring.datasource.username`
+- `spring.datasource.password`
+
+3. Set a strong JWT secret in `application.yaml`:
+- `jwt.secret`
+- `jwt.expiration-ms`
+
+4. Start backend:
 ```bash
 cd gym-backend
 ./mvnw spring-boot:run
@@ -52,12 +70,12 @@ cd gym-backend
 
 Backend URL: `http://localhost:9999`
 
-### Seeded Data
+## Seeded Data
 
-On startup, the app seeds:
-- Admin user: `admin` / `admin123`
-- Sample plans: Basic, Premium, Elite
-- Sample trainers
+On startup, the app seeds default data:
+- Admin user: `admin` / `admin123` (BCrypt-encoded password)
+- Plans: Basic, Premium, Elite
+- Trainers: two sample trainers
 
 ## Frontend Setup (`gym-frontend`)
 
@@ -73,18 +91,19 @@ npm run dev
 
 Frontend URL: `http://localhost:5173`
 
-The frontend calls backend at `http://localhost:9999/api` (configured in `gym-frontend/src/services/api.js`).
+Frontend API base URL is configured in `gym-frontend/src/services/api.js`:
+- `http://localhost:9999/api`
 
 ## Main API Groups
 
-- `POST /api/auth/login`
-- `POST /api/auth/signup`
-- `/api/home/dashboard`
-- `/api/members`
-- `/api/trainers`
-- `/api/plans`
-- `/api/attendance`
-- `/api/payments`
+- Auth: `/api/auth/*`
+- Admin users: `/api/admin/users/*`
+- Dashboard: `/api/home/dashboard`
+- Members: `/api/members/*`
+- Trainers: `/api/trainers/*`
+- Plans: `/api/plans/*`
+- Attendance: `/api/attendance/*`
+- Payments: `/api/payments/*`
 
 ## Build for Production
 
@@ -107,7 +126,9 @@ Run jar:
 java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
 ```
 
-## Notes
+## Current Notes
 
-- CORS currently allows local frontend ports `5173` and `5174`.
-- Current auth is basic (plain credential check). For production, use Spring Security + password hashing + JWT.
+- CORS currently allows local frontend ports `5173` and `5174`
+- JWT token is stored in browser `localStorage`
+- API client auto-attaches token and logs user out on `401`
+- `application.yaml` currently contains local DB credentials; move to env variables for deployment
