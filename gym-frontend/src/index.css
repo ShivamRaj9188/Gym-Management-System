@@ -98,14 +98,12 @@ h6,
   left: -100%;
   width: 60%;
   height: 100%;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
-    transparent 70%
-  );
+  background: linear-gradient(105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.04) 45%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.04) 55%,
+      transparent 70%);
   animation: heroShimmer 4s ease-in-out 0.8s infinite;
   pointer-events: none;
   z-index: 1;
@@ -207,41 +205,49 @@ h6,
 }
 
 /* ── Staggered dashboard stat cards ── */
-.row > .col-12:nth-child(1) > .card,
-.row > .col-12:nth-child(1) > article > .card {
+.row>.col-12:nth-child(1)>.card,
+.row>.col-12:nth-child(1)>article>.card {
   animation-delay: 0ms;
 }
-.row > .col-12:nth-child(2) > .card,
-.row > .col-12:nth-child(2) > article > .card {
+
+.row>.col-12:nth-child(2)>.card,
+.row>.col-12:nth-child(2)>article>.card {
   animation-delay: 80ms;
 }
-.row > .col-12:nth-child(3) > .card,
-.row > .col-12:nth-child(3) > article > .card {
+
+.row>.col-12:nth-child(3)>.card,
+.row>.col-12:nth-child(3)>article>.card {
   animation-delay: 160ms;
 }
-.row > .col-12:nth-child(4) > .card,
-.row > .col-12:nth-child(4) > article > .card {
+
+.row>.col-12:nth-child(4)>.card,
+.row>.col-12:nth-child(4)>article>.card {
   animation-delay: 240ms;
 }
-.row > .col-12:nth-child(5) > .card,
-.row > .col-12:nth-child(5) > article > .card {
+
+.row>.col-12:nth-child(5)>.card,
+.row>.col-12:nth-child(5)>article>.card {
   animation-delay: 320ms;
 }
 
 /* Dashboard stat cards child-level stagger */
-.row > [class*="col-"]:nth-child(1) > article.card {
+.row>[class*="col-"]:nth-child(1)>article.card {
   animation-delay: 0ms;
 }
-.row > [class*="col-"]:nth-child(2) > article.card {
+
+.row>[class*="col-"]:nth-child(2)>article.card {
   animation-delay: 80ms;
 }
-.row > [class*="col-"]:nth-child(3) > article.card {
+
+.row>[class*="col-"]:nth-child(3)>article.card {
   animation-delay: 100ms;
 }
-.row > [class*="col-"]:nth-child(4) > article.card {
+
+.row>[class*="col-"]:nth-child(4)>article.card {
   animation-delay: 150ms;
 }
-.row > [class*="col-"]:nth-child(5) > article.card {
+
+.row>[class*="col-"]:nth-child(5)>article.card {
   animation-delay: 200ms;
 }
 
@@ -283,15 +289,41 @@ h6,
   animation: rowSlideIn 400ms ease-out both;
 }
 
-.table tbody tr:nth-child(1) { animation-delay: 0ms; }
-.table tbody tr:nth-child(2) { animation-delay: 40ms; }
-.table tbody tr:nth-child(3) { animation-delay: 80ms; }
-.table tbody tr:nth-child(4) { animation-delay: 120ms; }
-.table tbody tr:nth-child(5) { animation-delay: 160ms; }
-.table tbody tr:nth-child(6) { animation-delay: 200ms; }
-.table tbody tr:nth-child(7) { animation-delay: 240ms; }
-.table tbody tr:nth-child(8) { animation-delay: 280ms; }
-.table tbody tr:nth-child(n+9) { animation-delay: 320ms; }
+.table tbody tr:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.table tbody tr:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.table tbody tr:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.table tbody tr:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+.table tbody tr:nth-child(5) {
+  animation-delay: 160ms;
+}
+
+.table tbody tr:nth-child(6) {
+  animation-delay: 200ms;
+}
+
+.table tbody tr:nth-child(7) {
+  animation-delay: 240ms;
+}
+
+.table tbody tr:nth-child(8) {
+  animation-delay: 280ms;
+}
+
+.table tbody tr:nth-child(n+9) {
+  animation-delay: 320ms;
+}
 
 .table tbody tr:hover {
   transform: translateY(-3px) scale(1.005);
@@ -557,6 +589,7 @@ a:hover {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -568,6 +601,7 @@ a:hover {
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -578,6 +612,7 @@ a:hover {
   0% {
     left: -100%;
   }
+
   50%,
   100% {
     left: 200%;
@@ -589,6 +624,7 @@ a:hover {
     opacity: 0;
     transform: translateY(-12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -600,6 +636,7 @@ a:hover {
     opacity: 0;
     transform: translateX(-12px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -611,6 +648,7 @@ a:hover {
     opacity: 0;
     transform: translateY(-6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -621,6 +659,7 @@ a:hover {
   from {
     filter: brightness(1);
   }
+
   to {
     filter: brightness(1.15);
   }
@@ -631,14 +670,62 @@ a:hover {
     opacity: 0.5;
     transform: scale(1);
   }
+
   to {
     opacity: 0.8;
     transform: scale(1.08);
   }
 }
 
+/* ── Skeleton loaders ── */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.04) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.skeleton-text {
+  height: 14px;
+  margin-bottom: 8px;
+}
+
+.skeleton-heading {
+  height: 28px;
+  width: 40%;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Pagination controls ── */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pagination-controls .btn {
+  min-width: 36px;
+}
+
+.pagination-controls .page-info {
+  color: rgba(223, 230, 243, 0.7);
+  font-size: 0.85rem;
+}
+
 /* ── Reduced motion preference ── */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

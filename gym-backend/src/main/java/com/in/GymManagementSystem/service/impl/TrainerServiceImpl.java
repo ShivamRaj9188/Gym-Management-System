@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @Service
 @RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
@@ -24,6 +27,11 @@ public class TrainerServiceImpl implements TrainerService {
         return trainerRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<TrainerDTO> getAllTrainersPaged(Pageable pageable) {
+        return trainerRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     @Override

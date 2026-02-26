@@ -33,9 +33,9 @@ function TrainerAssignment() {
   const [error, setError] = useState("");
 
   const loadData = async () => {
-    const [trainerRes, memberRes] = await Promise.all([getTrainers(), getMembers()]);
-    setTrainers(trainerRes);
-    setMembers(memberRes);
+    const [trainerRes, memberRes] = await Promise.all([getTrainers(0, 100), getMembers(0, 100)]);
+    setTrainers(trainerRes.content || trainerRes);
+    setMembers(memberRes.content || memberRes);
   };
 
   useEffect(() => {

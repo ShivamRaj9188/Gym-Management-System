@@ -30,8 +30,27 @@ function Dashboard() {
     return (
       <section className="card border-0 shadow-sm">
         <div className="card-body p-4">
-          <h2 className="h3 mb-3">Dashboard</h2>
-          <p className="text-muted mb-0">Loading dashboard data...</p>
+          <h2 className="h3 mb-3">Dashboard Overview</h2>
+          <div className="row g-3">
+            {[1, 2, 3, 4].map(i => (
+              <div className="col-12 col-md-6 col-xl-3" key={i}>
+                <article className="card h-100 bg-body-tertiary border-0">
+                  <div className="card-body">
+                    <div className="skeleton skeleton-text" style={{ width: "60%" }}></div>
+                    <div className="skeleton skeleton-heading mt-2"></div>
+                  </div>
+                </article>
+              </div>
+            ))}
+            <div className="col-12 col-xl-6">
+              <article className="card h-100 bg-body-tertiary border-0">
+                <div className="card-body">
+                  <div className="skeleton skeleton-text" style={{ width: "50%" }}></div>
+                  <div className="skeleton skeleton-heading mt-2"></div>
+                </div>
+              </article>
+            </div>
+          </div>
         </div>
       </section>
     );

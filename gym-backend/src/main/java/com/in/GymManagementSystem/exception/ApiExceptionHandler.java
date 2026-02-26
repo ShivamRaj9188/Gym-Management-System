@@ -1,10 +1,9 @@
 package com.in.GymManagementSystem.exception;
 
-import com.in.GymManagementSystem.exception.ResourceNotFoundException;
-
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +12,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * OWASP: Global exception handler — returns consistent error responses
+ * without leaking internal details (stack traces, class names, etc.).
+ */
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -47,5 +50,22 @@ public class ApiExceptionHandler {
         Map<String, String> body = new HashMap<>();
         body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    // OWASP: Handle malformed JSON bodies gracefully
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleMalformedJson(HttpMessageNotReadableException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Malformed request body.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    // OWASP: Catch-all handler — never leak stack traces or internal details to
+    // client
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "An unexpected error occurred.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

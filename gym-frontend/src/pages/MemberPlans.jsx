@@ -33,11 +33,14 @@ function MemberPlans() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [memberPage, setMemberPage] = useState(0);
+  const [memberTotalPages, setMemberTotalPages] = useState(0);
 
-  const loadData = async () => {
-    const [planRes, memberRes] = await Promise.all([getPlans(), getMembers()]);
+  const loadData = async (page = memberPage) => {
+    const [planRes, memberRes] = await Promise.all([getPlans(), getMembers(page)]);
     setPlans(planRes);
-    setMembers(memberRes);
+    setMembers(memberRes.content || []);
+    setMemberTotalPages(memberRes.totalPages || 0);
   };
 
   useEffect(() => {
@@ -492,6 +495,13 @@ function MemberPlans() {
                 </tbody>
               </table>
             </div>
+            {memberTotalPages > 1 && (
+              <div className="pagination-controls">
+                <button className="btn btn-sm btn-outline-secondary" disabled={memberPage === 0} onClick={() => { setMemberPage(p => p - 1); loadData(memberPage - 1); }}>Prev</button>
+                <span className="page-info">Page {memberPage + 1} of {memberTotalPages}</span>
+                <button className="btn btn-sm btn-outline-secondary" disabled={memberPage >= memberTotalPages - 1} onClick={() => { setMemberPage(p => p + 1); loadData(memberPage + 1); }}>Next</button>
+              </div>
+            )}
           </div>
         </div>
       </div>

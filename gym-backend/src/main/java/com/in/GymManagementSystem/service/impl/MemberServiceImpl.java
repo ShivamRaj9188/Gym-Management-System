@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
@@ -30,6 +33,11 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<MemberDTO> getAllMembersPaged(Pageable pageable) {
+        return memberRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     @Override

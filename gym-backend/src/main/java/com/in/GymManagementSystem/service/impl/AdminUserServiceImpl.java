@@ -5,7 +5,9 @@ import com.in.GymManagementSystem.entity.User;
 import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.UserRepository;
 import com.in.GymManagementSystem.service.AdminUserService;
+import com.in.GymManagementSystem.service.AuditService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.List;
 public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     @Override
     public List<AdminUserDTO> getAllUsers() {
@@ -36,6 +39,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         user.setVerified(true);
         userRepository.save(user);
+
+        auditService.log("VERIFY_USER", "User", id, currentUsername(),
+                "Verified user: " + user.getUsername());
+
         return toDto(user);
     }
 
@@ -51,6 +58,10 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         user.setVerified(false);
         userRepository.save(user);
+
+        auditService.log("UNVERIFY_USER", "User", id, currentUsername(),
+                "Unverified user: " + user.getUsername());
+
         return toDto(user);
     }
 
@@ -64,7 +75,11 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw new IllegalArgumentException("Cannot delete admin user");
         }
 
+        String deletedUsername = user.getUsername();
         userRepository.delete(user);
+
+        auditService.log("DELETE_USER", "User", id, currentUsername(),
+                "Deleted user: " + deletedUsername);
     }
 
     private AdminUserDTO toDto(User user) {
@@ -74,5 +89,13 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .role(user.getRole())
                 .verified(user.isVerified())
                 .build();
+    }
+
+    private String currentUsername() {
+        try {
+            return SecurityContextHolder.getContext().getAuthentication().getName();
+        } catch (Exception e) {
+            return "system";
+        }
     }
 }

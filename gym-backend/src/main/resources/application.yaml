@@ -1,5 +1,10 @@
 server:
   port: 9999
+  # OWASP: Never expose internal error details to clients
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/testdb
