@@ -24,7 +24,7 @@ const getTodayString = () => {
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
-const isBeforeToday = dateString => dateString && dateString < getTodayString();
+const isNotToday = dateString => dateString && dateString !== getTodayString();
 
 function Attendance() {
   const [attendanceRows, setAttendanceRows] = useState([]);
@@ -84,8 +84,8 @@ function Attendance() {
         setError("Please select a member.");
         return;
       }
-      if (form.date && isBeforeToday(form.date)) {
-        setError("Attendance cannot be marked for past dates.");
+      if (form.date && isNotToday(form.date)) {
+        setError("Attendance can only be marked for today.");
         return;
       }
 
@@ -106,7 +106,7 @@ function Attendance() {
   const handleCheckOut = async row => {
     clearMessages();
     try {
-      if (row.date && isBeforeToday(row.date)) {
+      if (row.date && isNotToday(row.date)) {
         setError("Attendance checkout is only allowed for today.");
         return;
       }
@@ -191,6 +191,7 @@ function Attendance() {
                         type="date"
                         className="form-control"
                         min={getTodayString()}
+                        max={getTodayString()}
                         value={form.date}
                         onChange={e => setForm(prev => ({ ...prev, date: e.target.value }))}
                       />
@@ -267,7 +268,7 @@ function Attendance() {
                           <button
                             className="btn btn-sm btn-outline-warning"
                             onClick={() => handleCheckOut(row)}
-                            disabled={isBeforeToday(row.date)}
+                            disabled={isNotToday(row.date)}
                           >
                             Check Out
                           </button>

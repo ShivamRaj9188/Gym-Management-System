@@ -49,9 +49,10 @@ public class AttendanceServiceImpl implements AttendanceService {
         Member member = memberRepository.findById(attendanceDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        LocalDate attendanceDate = attendanceDTO.getDate() != null ? attendanceDTO.getDate() : LocalDate.now();
-        if (attendanceDate.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Attendance cannot be marked for past dates.");
+        LocalDate today = LocalDate.now();
+        LocalDate attendanceDate = attendanceDTO.getDate() != null ? attendanceDTO.getDate() : today;
+        if (!attendanceDate.equals(today)) {
+            throw new IllegalArgumentException("Attendance can only be marked for today.");
         }
         if (attendanceRepository.existsByMemberIdAndDate(attendanceDTO.getMemberId(), attendanceDate)) {
             throw new IllegalArgumentException("Attendance for this member and date already exists.");
@@ -74,7 +75,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         Attendance attendance = attendanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Attendance record not found"));
 
-        if (attendance.getDate() != null && attendance.getDate().isBefore(LocalDate.now())) {
+        if (attendance.getDate() != null && !attendance.getDate().equals(LocalDate.now())) {
             throw new IllegalArgumentException("Attendance checkout is only allowed for today.");
         }
         if (attendance.getCheckOut() != null) {
