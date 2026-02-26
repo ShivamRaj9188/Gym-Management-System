@@ -11,5 +11,6 @@ import java.util.List;
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByDate(LocalDate date);
     List<Attendance> findByMemberId(Long memberId);
+    boolean existsByMemberIdAndDate(Long memberId, LocalDate date);
     long countByDate(LocalDate date);
 }

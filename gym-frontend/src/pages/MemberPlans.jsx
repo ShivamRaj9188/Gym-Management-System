@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createMember, deleteMember, getMembers, updateMember } from "../services/MemberService";
 import { createPlan, deletePlan, getPlans, updatePlan } from "../services/PlanService";
+import { isValidEmail, isValidName, isValidPhone, isValidPlanName } from "../utils/validators";
 
 const emptyPlanForm = {
   name: "",
@@ -19,7 +20,6 @@ const emptyMemberForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
-const isValidEmail = email => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 
 function MemberPlans() {
   const [plans, setPlans] = useState([]);
@@ -28,6 +28,8 @@ function MemberPlans() {
   const [memberForm, setMemberForm] = useState(emptyMemberForm);
   const [editingPlanId, setEditingPlanId] = useState(null);
   const [editingMemberId, setEditingMemberId] = useState(null);
+  const [planErrors, setPlanErrors] = useState({});
+  const [memberErrors, setMemberErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -56,12 +58,15 @@ function MemberPlans() {
   const clearMessages = () => {
     setError("");
     setMessage("");
+    setPlanErrors({});
+    setMemberErrors({});
   };
 
   const handlePlanSubmit = async e => {
     e.preventDefault();
     clearMessages();
     try {
+      const nextPlanErrors = {};
       const payload = {
         name: planForm.name.trim(),
         description: planForm.description.trim(),
@@ -71,7 +76,27 @@ function MemberPlans() {
       };
 
       if (!payload.name) {
-        setError("Plan name is required.");
+        nextPlanErrors.name = "Plan name is required.";
+        setPlanErrors(nextPlanErrors);
+        setError(nextPlanErrors.name);
+        return;
+      }
+      if (!isValidPlanName(payload.name)) {
+        nextPlanErrors.name = "Plan name must be 2-60 letters and can include single spaces, apostrophes, or hyphens.";
+        setPlanErrors(nextPlanErrors);
+        setError(nextPlanErrors.name);
+        return;
+      }
+      if (!Number.isInteger(payload.durationMonths) || payload.durationMonths < 1 || payload.durationMonths > 60) {
+        nextPlanErrors.durationMonths = "Plan duration must be between 1 and 60 months.";
+        setPlanErrors(nextPlanErrors);
+        setError(nextPlanErrors.durationMonths);
+        return;
+      }
+      if (!Number.isFinite(payload.price) || payload.price < 1000) {
+        nextPlanErrors.price = "Plan price must be at least 1000.";
+        setPlanErrors(nextPlanErrors);
+        setError(nextPlanErrors.price);
         return;
       }
 
@@ -122,24 +147,64 @@ function MemberPlans() {
     e.preventDefault();
     clearMessages();
     try {
+      const nextMemberErrors = {};
       const payload = {
         name: memberForm.name.trim(),
-        email: memberForm.email.trim(),
+        email: memberForm.email.trim().toLowerCase(),
         phone: memberForm.phone.trim(),
         planId: memberForm.planId ? Number(memberForm.planId) : null,
         active: Boolean(memberForm.active),
       };
 
       if (!payload.name) {
-        setError("Member name is required.");
+        nextMemberErrors.name = "Member name is required.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.name);
+        return;
+      }
+      if (!isValidName(payload.name)) {
+        nextMemberErrors.name = "Member name must be 2-60 letters and can include single spaces, apostrophes, or hyphens.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.name);
         return;
       }
       if (!payload.email) {
-        setError("Member email is required.");
+        nextMemberErrors.email = "Member email is required.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.email);
         return;
       }
       if (!isValidEmail(payload.email)) {
-        setError("Please enter a valid member email.");
+        nextMemberErrors.email = "Member email format is invalid.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.email);
+        return;
+      }
+      if (!payload.phone) {
+        nextMemberErrors.phone = "Member phone is required.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.phone);
+        return;
+      }
+      if (!isValidPhone(payload.phone)) {
+        nextMemberErrors.phone = "Member phone must be a valid 10-digit number starting with 6-9.";
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.phone);
+        return;
+      }
+      const duplicateMember = members.find(
+        member =>
+          member.id !== editingMemberId &&
+          ((member.email || "").toLowerCase() === payload.email || (member.phone || "") === payload.phone)
+      );
+      if (duplicateMember) {
+        if ((duplicateMember.email || "").toLowerCase() === payload.email) {
+          nextMemberErrors.email = "Member email already exists.";
+        } else {
+          nextMemberErrors.phone = "Member phone already exists.";
+        }
+        setMemberErrors(nextMemberErrors);
+        setError(nextMemberErrors.email || nextMemberErrors.phone);
         return;
       }
 
@@ -209,11 +274,13 @@ function MemberPlans() {
                 <h3 className="h5 mb-3">{editingPlanId ? "Edit Plan" : "Create Plan"}</h3>
                 <form onSubmit={handlePlanSubmit}>
                   <input
-                    className="form-control mb-2"
+                    className={`form-control mb-2 ${planErrors.name ? "is-invalid" : ""}`}
                     placeholder="Plan name"
+                    maxLength={60}
                     value={planForm.name}
                     onChange={e => setPlanForm(prev => ({ ...prev, name: e.target.value }))}
                   />
+                  {planErrors.name ? <div className="invalid-feedback d-block mb-2">{planErrors.name}</div> : null}
                   <textarea
                     className="form-control mb-2"
                     placeholder="Description"
@@ -226,22 +293,27 @@ function MemberPlans() {
                       <input
                         type="number"
                         min="1"
-                        className="form-control"
+                        max="60"
+                        className={`form-control ${planErrors.durationMonths ? "is-invalid" : ""}`}
                         placeholder="Duration (months)"
                         value={planForm.durationMonths}
                         onChange={e => setPlanForm(prev => ({ ...prev, durationMonths: e.target.value }))}
                       />
+                      {planErrors.durationMonths ? (
+                        <div className="invalid-feedback d-block">{planErrors.durationMonths}</div>
+                      ) : null}
                     </div>
                     <div className="col-6">
                       <input
                         type="number"
-                        min="0"
+                        min="1000"
                         step="0.01"
-                        className="form-control"
+                        className={`form-control ${planErrors.price ? "is-invalid" : ""}`}
                         placeholder="Price"
                         value={planForm.price}
                         onChange={e => setPlanForm(prev => ({ ...prev, price: e.target.value }))}
                       />
+                      {planErrors.price ? <div className="invalid-feedback d-block">{planErrors.price}</div> : null}
                     </div>
                   </div>
                   <div className="form-check mb-3">
@@ -314,28 +386,35 @@ function MemberPlans() {
                 <h3 className="h5 mb-3">{editingMemberId ? "Edit Member" : "Create Member"}</h3>
                 <form onSubmit={handleMemberSubmit}>
                   <input
-                    className="form-control mb-2"
+                    className={`form-control mb-2 ${memberErrors.name ? "is-invalid" : ""}`}
                     placeholder="Member name"
+                    maxLength={60}
                     value={memberForm.name}
                     onChange={e => setMemberForm(prev => ({ ...prev, name: e.target.value }))}
                   />
+                  {memberErrors.name ? <div className="invalid-feedback d-block mb-2">{memberErrors.name}</div> : null}
                   <div className="row g-2 mb-2">
                     <div className="col-6">
                       <input
                         type="email"
-                        className="form-control"
+                        className={`form-control ${memberErrors.email ? "is-invalid" : ""}`}
                         placeholder="Email"
+                        maxLength={254}
                         value={memberForm.email}
                         onChange={e => setMemberForm(prev => ({ ...prev, email: e.target.value }))}
                       />
+                      {memberErrors.email ? <div className="invalid-feedback d-block">{memberErrors.email}</div> : null}
                     </div>
                     <div className="col-6">
                       <input
-                        className="form-control"
+                        type="tel"
+                        className={`form-control ${memberErrors.phone ? "is-invalid" : ""}`}
                         placeholder="Phone"
+                        maxLength={10}
                         value={memberForm.phone}
                         onChange={e => setMemberForm(prev => ({ ...prev, phone: e.target.value }))}
                       />
+                      {memberErrors.phone ? <div className="invalid-feedback d-block">{memberErrors.phone}</div> : null}
                     </div>
                   </div>
                   <select

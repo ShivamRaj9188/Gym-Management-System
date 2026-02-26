@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,11 +35,15 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     public TrainerDTO createTrainer(TrainerDTO trainerDTO) {
+        String normalizedEmail = normalizeEmail(trainerDTO.getEmail());
+        String normalizedPhone = normalizePhone(trainerDTO.getPhone());
+        ensureUniqueTrainerContact(normalizedEmail, normalizedPhone, null);
+
         Trainer trainer = Trainer.builder()
                 .name(trainerDTO.getName())
                 .specialization(trainerDTO.getSpecialization())
-                .email(trainerDTO.getEmail())
-                .phone(trainerDTO.getPhone())
+                .email(normalizedEmail)
+                .phone(normalizedPhone)
                 .build();
 
         trainer = trainerRepository.save(trainer);
@@ -50,11 +55,14 @@ public class TrainerServiceImpl implements TrainerService {
     public TrainerDTO updateTrainer(Long id, TrainerDTO trainerDTO) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trainer not found"));
+        String normalizedEmail = normalizeEmail(trainerDTO.getEmail());
+        String normalizedPhone = normalizePhone(trainerDTO.getPhone());
+        ensureUniqueTrainerContact(normalizedEmail, normalizedPhone, id);
 
         trainer.setName(trainerDTO.getName());
         trainer.setSpecialization(trainerDTO.getSpecialization());
-        trainer.setEmail(trainerDTO.getEmail());
-        trainer.setPhone(trainerDTO.getPhone());
+        trainer.setEmail(normalizedEmail);
+        trainer.setPhone(normalizedPhone);
 
         trainer = trainerRepository.save(trainer);
         return convertToDTO(trainer);
@@ -74,5 +82,29 @@ public class TrainerServiceImpl implements TrainerService {
                 .phone(trainer.getPhone())
                 .memberCount(trainer.getMembers() != null ? trainer.getMembers().size() : 0)
                 .build();
+    }
+
+    private void ensureUniqueTrainerContact(String email, String phone, Long currentId) {
+        boolean emailExists = currentId == null
+                ? trainerRepository.existsByEmailIgnoreCase(email)
+                : trainerRepository.existsByEmailIgnoreCaseAndIdNot(email, currentId);
+        if (emailExists) {
+            throw new IllegalArgumentException("Trainer email already exists.");
+        }
+
+        boolean phoneExists = currentId == null
+                ? trainerRepository.existsByPhone(phone)
+                : trainerRepository.existsByPhoneAndIdNot(phone, currentId);
+        if (phoneExists) {
+            throw new IllegalArgumentException("Trainer phone already exists.");
+        }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizePhone(String phone) {
+        return phone == null ? null : phone.trim();
     }
 }

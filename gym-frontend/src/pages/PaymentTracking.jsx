@@ -3,6 +3,7 @@ import { getMembers } from "../services/MemberService";
 import { getPayments, getPaymentsByMember, getPaymentsByStatus, createPayment, updatePaymentStatus, deletePayment } from "../services/PaymentService";
 import { getPlans } from "../services/PlanService";
 import { isAdmin } from "../services/AuthService";
+import { isValidPaymentMethod, isValidPaymentStatus } from "../utils/validators";
 
 const emptyPaymentForm = {
   memberId: "",
@@ -33,6 +34,7 @@ function PaymentTracking() {
   const [members, setMembers] = useState([]);
   const [plans, setPlans] = useState([]);
   const [form, setForm] = useState(emptyPaymentForm);
+  const [paymentErrors, setPaymentErrors] = useState({});
   const [statusFilter, setStatusFilter] = useState("");
   const [memberFilter, setMemberFilter] = useState("");
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,7 @@ function PaymentTracking() {
   const clearMessages = () => {
     setMessage("");
     setError("");
+    setPaymentErrors({});
   };
 
   const refreshPaymentsWithFilters = async () => {
@@ -84,22 +87,64 @@ function PaymentTracking() {
     e.preventDefault();
     clearMessages();
     try {
+      const nextPaymentErrors = {};
       if (!form.memberId || !form.planId || !form.amount || !form.paymentDate || !form.status) {
+        if (!form.memberId) nextPaymentErrors.memberId = "Member is required.";
+        if (!form.planId) nextPaymentErrors.planId = "Plan is required.";
+        if (!form.amount) nextPaymentErrors.amount = "Amount is required.";
+        if (!form.paymentDate) nextPaymentErrors.paymentDate = "Payment date is required.";
+        if (!form.status) nextPaymentErrors.status = "Status is required.";
+        setPaymentErrors(nextPaymentErrors);
         setError("Member, plan, amount, date, and status are required.");
         return;
       }
+      const amount = Number(form.amount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        nextPaymentErrors.amount = "Amount must be greater than zero.";
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.amount);
+        return;
+      }
+      const selectedPlan = plans.find(plan => Number(plan.id) === Number(form.planId));
+      if (selectedPlan && amount < Number(selectedPlan.price)) {
+        nextPaymentErrors.amount = `Amount cannot be less than selected plan price (Rs ${selectedPlan.price}).`;
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.amount);
+        return;
+      }
       if (!isCurrentYear(form.paymentDate)) {
-        setError("Only current year payments are allowed.");
+        nextPaymentErrors.paymentDate = "Only current year payments are allowed.";
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.paymentDate);
+        return;
+      }
+      if (!isValidPaymentStatus(form.status)) {
+        nextPaymentErrors.status = "Invalid payment status.";
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.status);
+        return;
+      }
+      const normalizedMethod = form.paymentMethod.trim();
+      if (normalizedMethod && !isValidPaymentMethod(normalizedMethod)) {
+        nextPaymentErrors.paymentMethod = "Payment method must be CASH, CARD, or UPI.";
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.paymentMethod);
+        return;
+      }
+      if (form.dueDate && form.dueDate < form.paymentDate) {
+        nextPaymentErrors.dueDate = "Due date cannot be before payment date.";
+        setPaymentErrors(nextPaymentErrors);
+        setError(nextPaymentErrors.dueDate);
         return;
       }
 
       await createPayment({
         memberId: Number(form.memberId),
         planId: Number(form.planId),
-        amount: Number(form.amount),
+        amount,
         paymentDate: form.paymentDate,
         status: form.status,
-        paymentMethod: form.paymentMethod.trim() || null,
+        paymentMethod: normalizedMethod || null,
         dueDate: form.dueDate || null,
       });
 
@@ -116,6 +161,10 @@ function PaymentTracking() {
     try {
       if (isPastYearPayment(payment.paymentDate)) {
         setError("Cannot update status for last year payments.");
+        return;
+      }
+      if (!isValidPaymentStatus(status)) {
+        setError("Invalid payment status.");
         return;
       }
       await updatePaymentStatus(payment.id, status);
@@ -181,7 +230,7 @@ function PaymentTracking() {
                 <h3 className="h5 mb-3">Create Payment</h3>
                 <form onSubmit={handleCreatePayment}>
                   <select
-                    className="form-select mb-2"
+                    className={`form-select mb-2 ${paymentErrors.memberId ? "is-invalid" : ""}`}
                     value={form.memberId}
                     onChange={e => setForm(prev => ({ ...prev, memberId: e.target.value }))}
                   >
@@ -192,8 +241,9 @@ function PaymentTracking() {
                       </option>
                     ))}
                   </select>
+                  {paymentErrors.memberId ? <div className="invalid-feedback d-block mb-2">{paymentErrors.memberId}</div> : null}
                   <select
-                    className="form-select mb-2"
+                    className={`form-select mb-2 ${paymentErrors.planId ? "is-invalid" : ""}`}
                     value={form.planId}
                     onChange={e => setForm(prev => ({ ...prev, planId: e.target.value }))}
                   >
@@ -204,21 +254,23 @@ function PaymentTracking() {
                       </option>
                     ))}
                   </select>
+                  {paymentErrors.planId ? <div className="invalid-feedback d-block mb-2">{paymentErrors.planId}</div> : null}
                   <div className="row g-2 mb-2">
                     <div className="col-6">
                       <input
                         type="number"
-                        min="0"
+                        min="1"
                         step="0.01"
-                        className="form-control"
+                        className={`form-control ${paymentErrors.amount ? "is-invalid" : ""}`}
                         placeholder="Amount"
                         value={form.amount}
                         onChange={e => setForm(prev => ({ ...prev, amount: e.target.value }))}
                       />
+                      {paymentErrors.amount ? <div className="invalid-feedback d-block">{paymentErrors.amount}</div> : null}
                     </div>
                     <div className="col-6">
                       <select
-                        className="form-select"
+                        className={`form-select ${paymentErrors.status ? "is-invalid" : ""}`}
                         value={form.status}
                         onChange={e => setForm(prev => ({ ...prev, status: e.target.value }))}
                       >
@@ -226,6 +278,7 @@ function PaymentTracking() {
                         <option value="PAID">PAID</option>
                         <option value="FAILED">FAILED</option>
                       </select>
+                      {paymentErrors.status ? <div className="invalid-feedback d-block">{paymentErrors.status}</div> : null}
                     </div>
                   </div>
                   <div className="row g-2 mb-2">
@@ -233,29 +286,38 @@ function PaymentTracking() {
                       <label className="form-label mb-1">Payment Date</label>
                       <input
                         type="date"
-                        className="form-control"
+                        className={`form-control ${paymentErrors.paymentDate ? "is-invalid" : ""}`}
                         min={getYearStart()}
                         max={getYearEnd()}
                         value={form.paymentDate}
                         onChange={e => setForm(prev => ({ ...prev, paymentDate: e.target.value }))}
                       />
+                      {paymentErrors.paymentDate ? (
+                        <div className="invalid-feedback d-block">{paymentErrors.paymentDate}</div>
+                      ) : null}
                     </div>
                     <div className="col-6">
                       <label className="form-label mb-1">Due Date</label>
                       <input
                         type="date"
-                        className="form-control"
+                        className={`form-control ${paymentErrors.dueDate ? "is-invalid" : ""}`}
+                        min={form.paymentDate || undefined}
                         value={form.dueDate}
                         onChange={e => setForm(prev => ({ ...prev, dueDate: e.target.value }))}
                       />
+                      {paymentErrors.dueDate ? <div className="invalid-feedback d-block">{paymentErrors.dueDate}</div> : null}
                     </div>
                   </div>
                   <input
-                    className="form-control mb-3"
-                    placeholder="Payment method (cash/card/upi)"
+                    className={`form-control mb-3 ${paymentErrors.paymentMethod ? "is-invalid" : ""}`}
+                    placeholder="Payment method (CASH/CARD/UPI)"
+                    maxLength={10}
                     value={form.paymentMethod}
-                    onChange={e => setForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                    onChange={e => setForm(prev => ({ ...prev, paymentMethod: e.target.value.toUpperCase() }))}
                   />
+                  {paymentErrors.paymentMethod ? (
+                    <div className="invalid-feedback d-block mb-3">{paymentErrors.paymentMethod}</div>
+                  ) : null}
                   <button type="submit" className="btn btn-primary">
                     Create Payment
                   </button>

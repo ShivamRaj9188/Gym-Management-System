@@ -5,6 +5,7 @@ import {
   removeTrainerFromMember,
 } from "../services/MemberService";
 import { createTrainer, deleteTrainer, getTrainers, updateTrainer } from "../services/TrainerService";
+import { isValidEmail, isValidName, isValidPhone, isValidSpecialization } from "../utils/validators";
 
 const emptyTrainerForm = {
   name: "",
@@ -19,7 +20,6 @@ const emptyAssignmentForm = {
 };
 
 const getErrorMessage = error => error?.response?.data?.message || "Something went wrong. Please try again.";
-const isValidEmail = email => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 
 function TrainerAssignment() {
   const [trainers, setTrainers] = useState([]);
@@ -27,6 +27,7 @@ function TrainerAssignment() {
   const [trainerForm, setTrainerForm] = useState(emptyTrainerForm);
   const [assignmentForm, setAssignmentForm] = useState(emptyAssignmentForm);
   const [editingTrainerId, setEditingTrainerId] = useState(null);
+  const [trainerErrors, setTrainerErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -54,29 +55,82 @@ function TrainerAssignment() {
   const clearMessages = () => {
     setError("");
     setMessage("");
+    setTrainerErrors({});
   };
 
   const handleTrainerSubmit = async e => {
     e.preventDefault();
     clearMessages();
     try {
+      const nextTrainerErrors = {};
       const payload = {
         name: trainerForm.name.trim(),
         specialization: trainerForm.specialization.trim(),
-        email: trainerForm.email.trim(),
+        email: trainerForm.email.trim().toLowerCase(),
         phone: trainerForm.phone.trim(),
       };
 
       if (!payload.name) {
-        setError("Trainer name is required.");
+        nextTrainerErrors.name = "Trainer name is required.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.name);
+        return;
+      }
+      if (!isValidName(payload.name)) {
+        nextTrainerErrors.name = "Trainer name must be 2-60 letters and can include single spaces, apostrophes, or hyphens.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.name);
+        return;
+      }
+      if (!payload.specialization) {
+        nextTrainerErrors.specialization = "Trainer specialization is required.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.specialization);
+        return;
+      }
+      if (!isValidSpecialization(payload.specialization)) {
+        nextTrainerErrors.specialization = "Trainer specialization must be 2-80 letters and can include single spaces, apostrophes, or hyphens.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.specialization);
         return;
       }
       if (!payload.email) {
-        setError("Trainer email is required.");
+        nextTrainerErrors.email = "Trainer email is required.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.email);
         return;
       }
       if (!isValidEmail(payload.email)) {
-        setError("Please enter a valid trainer email.");
+        nextTrainerErrors.email = "Trainer email format is invalid.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.email);
+        return;
+      }
+      if (!payload.phone) {
+        nextTrainerErrors.phone = "Trainer phone is required.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.phone);
+        return;
+      }
+      if (!isValidPhone(payload.phone)) {
+        nextTrainerErrors.phone = "Trainer phone must be a valid 10-digit number starting with 6-9.";
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.phone);
+        return;
+      }
+      const duplicateTrainer = trainers.find(
+        trainer =>
+          trainer.id !== editingTrainerId &&
+          ((trainer.email || "").toLowerCase() === payload.email || (trainer.phone || "") === payload.phone)
+      );
+      if (duplicateTrainer) {
+        if ((duplicateTrainer.email || "").toLowerCase() === payload.email) {
+          nextTrainerErrors.email = "Trainer email already exists.";
+        } else {
+          nextTrainerErrors.phone = "Trainer phone already exists.";
+        }
+        setTrainerErrors(nextTrainerErrors);
+        setError(nextTrainerErrors.email || nextTrainerErrors.phone);
         return;
       }
 
@@ -170,34 +224,45 @@ function TrainerAssignment() {
                 <h3 className="h5 mb-3">{editingTrainerId ? "Edit Trainer" : "Create Trainer"}</h3>
                 <form onSubmit={handleTrainerSubmit}>
                   <input
-                    className="form-control mb-2"
+                    className={`form-control mb-2 ${trainerErrors.name ? "is-invalid" : ""}`}
                     placeholder="Name"
+                    maxLength={60}
                     value={trainerForm.name}
                     onChange={e => setTrainerForm(prev => ({ ...prev, name: e.target.value }))}
                   />
+                  {trainerErrors.name ? <div className="invalid-feedback d-block mb-2">{trainerErrors.name}</div> : null}
                   <input
-                    className="form-control mb-2"
+                    className={`form-control mb-2 ${trainerErrors.specialization ? "is-invalid" : ""}`}
                     placeholder="Specialization"
+                    maxLength={80}
                     value={trainerForm.specialization}
                     onChange={e => setTrainerForm(prev => ({ ...prev, specialization: e.target.value }))}
                   />
+                  {trainerErrors.specialization ? (
+                    <div className="invalid-feedback d-block mb-2">{trainerErrors.specialization}</div>
+                  ) : null}
                   <div className="row g-2 mb-3">
                     <div className="col-6">
                       <input
                         type="email"
-                        className="form-control"
+                        className={`form-control ${trainerErrors.email ? "is-invalid" : ""}`}
                         placeholder="Email"
+                        maxLength={254}
                         value={trainerForm.email}
                         onChange={e => setTrainerForm(prev => ({ ...prev, email: e.target.value }))}
                       />
+                      {trainerErrors.email ? <div className="invalid-feedback d-block">{trainerErrors.email}</div> : null}
                     </div>
                     <div className="col-6">
                       <input
-                        className="form-control"
+                        type="tel"
+                        className={`form-control ${trainerErrors.phone ? "is-invalid" : ""}`}
                         placeholder="Phone"
+                        maxLength={10}
                         value={trainerForm.phone}
                         onChange={e => setTrainerForm(prev => ({ ...prev, phone: e.target.value }))}
                       />
+                      {trainerErrors.phone ? <div className="invalid-feedback d-block">{trainerErrors.phone}</div> : null}
                     </div>
                   </div>
                   <button type="submit" className="btn btn-primary me-2">
