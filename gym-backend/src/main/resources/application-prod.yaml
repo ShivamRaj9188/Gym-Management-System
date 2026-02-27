@@ -13,11 +13,15 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000
+      initialization-fail-timeout: -1
       maximum-pool-size: 5
       minimum-idle: 1
       idle-timeout: 300000
       max-lifetime: 600000
       keepalive-time: 60000
+      data-source-properties:
+        ssl: true
+        sslmode: require
   jpa:
     hibernate:
       ddl-auto: update
