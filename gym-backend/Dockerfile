@@ -11,5 +11,6 @@ RUN ./mvnw clean package -DskipTests -q
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 9999
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV PORT=9999
+EXPOSE ${PORT}
+ENTRYPOINT java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} -Dserver.port=${PORT} -jar app.jar
