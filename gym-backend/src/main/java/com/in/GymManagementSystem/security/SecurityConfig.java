@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     // OWASP: CORS origins configurable via environment variable for deployment
     // flexibility
-    @Value("${cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174}")
+    @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
     @Bean
