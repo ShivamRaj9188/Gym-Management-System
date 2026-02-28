@@ -1,6 +1,7 @@
 package com.in.GymManagementSystem.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +17,7 @@ import java.util.Map;
  * OWASP: Global exception handler — returns consistent error responses
  * without leaking internal details (stack traces, class names, etc.).
  */
+@Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -64,6 +66,7 @@ public class ApiExceptionHandler {
     // client
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        log.error("Unhandled exception caught by ApiExceptionHandler", ex);
         Map<String, String> body = new HashMap<>();
         body.put("message", "An unexpected error occurred.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
