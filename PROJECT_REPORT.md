@@ -4,8 +4,9 @@
 The Gym Management System is a full-stack web application to digitize gym operations including member lifecycle management, subscription plans, trainer assignment, attendance logging, payment tracking, and operational dashboard analytics.
 
 The solution is composed of:
-- Backend REST API (`gym-backend`) built with Spring Boot + PostgreSQL
-- Frontend SPA (`gym-frontend`) built with React + Vite + Axios
+- Backend REST API (`gym-backend`) built with Spring Boot + PostgreSQL, deployed via Docker on **Railway**.
+- Frontend SPA (`gym-frontend`) built with React + Vite + Axios, deployed statically on **Vercel**.
+- Database hosted on a scaled connection pool via **Supabase**.
 
 ## 2. Problem Statement
 Many gyms rely on manual registers and disconnected tools, creating data inconsistency and operational delays. This project centralizes core workflows into one platform for:
@@ -24,7 +25,9 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 
 ## 4. Scope of the Project
 ### In Scope
-- JWT-based login/signup flow
+- JWT-based login/signup flow with Refresh Tokens
+- Robust API Security (Rate Limiting, XSS Context Sanitization)
+- Global Error Handling via consistent REST payloads
 - Role-aware route and API protection
 - Admin user management (verify/unverify/delete non-admin users)
 - Plan, member, and trainer CRUD workflows
@@ -34,7 +37,6 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 - Dashboard KPIs: members, trainers, attendance, paid revenue
 
 ### Out of Scope (Current Version)
-- Refresh tokens and token revocation strategy
 - Granular RBAC beyond current ADMIN/USER pattern
 - Reporting exports (PDF/Excel)
 - Notification/reminder engine
@@ -201,8 +203,8 @@ npm run dev
 Runs on: `http://localhost:5173`
 
 ### Database
-- Create PostgreSQL database: `testdb`
-- Configure datasource in `gym-backend/src/main/resources/application.yaml`
+- **Local:** Create PostgreSQL database `testdb` and run the Spring Boot application on `default` profile.
+- **Production:** Hosted on **Supabase**. Configure `SPRING_DATASOURCE_URL`, `DB_USERNAME`, and `DB_PASSWORD` via environment variables. The `application-prod.yaml` ensures `ddl-auto: update` dynamically creates all schemas.
 
 ## 13. Testing Status
 - Backend has only base scaffold test class (`GymManagementSystemApplicationTests`).
@@ -210,19 +212,15 @@ Runs on: `http://localhost:5173`
 - Automated unit and integration coverage is still pending.
 
 ## 14. Current Limitations / Risks
-- No refresh token implementation.
 - No pagination on list-heavy endpoints.
 - No audit trail for sensitive admin operations.
-- DB credentials and JWT secret have local defaults in `application.yaml`; for production, override via environment variables (`DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`).
 
 ## 15. Future Enhancements
-- Add refresh-token flow and secure token rotation.
 - Introduce fine-grained role/permission model.
 - Add pagination, sorting, and richer filters.
 - Add exportable reports and trend analytics.
 - Add reminders for expiring plans and overdue dues.
 - Add unit/integration tests with CI pipeline.
-- Introduce Docker-based deployment with env-based secrets.
 
 ## 16. Conclusion
 The current version delivers a robust gym operations platform with secured API access, admin-controlled user activation, and complete foundational business modules. It is well-positioned for production hardening through enhanced token strategy, testing automation, and deployment standardization.

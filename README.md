@@ -1,9 +1,12 @@
 # Gym Management System
 
+**🚀 Live Demo:** [https://gym-management-system-blond.vercel.app](https://gym-management-system-blond.vercel.app)
+**⚙️ Backend API:** `https://gym-backend-production-2509.up.railway.app`
+
 Full-stack gym operations platform with:
-- Spring Boot REST API (`gym-backend`)
-- React + Vite frontend (`gym-frontend`)
-- PostgreSQL database
+- Spring Boot REST API (`gym-backend`) deployed on **Railway**
+- React + Vite frontend (`gym-frontend`) deployed on **Vercel**
+- PostgreSQL database hosted on **Supabase**
 
 It covers member management, trainer assignment, attendance, plans, payments, dashboard analytics, and admin-controlled user verification.
 
@@ -26,14 +29,15 @@ Gym Mangement system/
 
 ## Core Features
 
-- JWT Authentication: login/signup with token-based access control
-- User Verification Flow: new non-admin users require admin verification before login
-- Admin User Management: list users, verify/unverify users, delete non-admin users
-- Dashboard: total members, active members, trainers, attendance count, paid revenue
-- Member + Plan Management: CRUD operations and member-plan linking
-- Trainer Assignment: assign/unassign trainers to members
-- Attendance Tracking: mark check-in/check-out and filter by member/date
-- Payment Tracking: add payments, filter status/member, update payment status
+- **Security & Auth:** JWT Authentication with Refresh Tokens, Rate Limiting, and XSS Sanitization.
+- **User Verification Flow:** New non-admin users require admin verification before login.
+- **Admin User Management:** List users, verify/unverify users, delete non-admin users.
+- **Dashboard:** Total members, active members, trainers, attendance count, paid revenue.
+- **Member + Plan Management:** CRUD operations and member-plan linking.
+- **Trainer Assignment:** Assign/unassign trainers to members.
+- **Attendance Tracking:** Mark check-in/check-out and filter by member/date.
+- **Payment Tracking:** Add payments, filter status/member, update payment status.
+- **Global Error Handling:** Consistent API error envelopes across all endpoints.
 
 ## Authentication and Authorization
 
@@ -119,8 +123,24 @@ Frontend API base URL is configured in `gym-frontend/src/services/api.js`:
 - Attendance: `/api/attendance/*`
 - Payments: `/api/payments/*`
 
-## Build for Production
+## Build and Deploy for Production
 
+### Architecture
+- **Frontend** is hosted statically on **Vercel**.
+- **Backend** is deployed as a Dockerized service on **Railway**.
+- **Database** is a robust connection-pooled PostgreSQL instance on **Supabase**.
+
+### Environment Variables Required
+**Backend (Railway):**
+- `SPRING_DATASOURCE_URL`: Supabase JDBC URL (`jdbc:postgresql://...`)
+- `DB_USERNAME` & `DB_PASSWORD`: Supabase credentials
+- `JWT_SECRET`: Secure 256-bit+ secret key
+- `CORS_ORIGINS`: `https://gym-management-system-blond.vercel.app`
+
+**Frontend (Vercel):**
+- `VITE_API_URL`: `https://gym-backend-production-2509.up.railway.app/api`
+
+### Local Production Build
 Frontend:
 ```bash
 cd gym-frontend
@@ -135,14 +155,8 @@ cd gym-backend
 ```
 Jar output: `gym-backend/target`
 
-Run jar:
-```bash
-java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
-```
-
 ## Current Notes
 
-- CORS currently allows local frontend ports `5173` and `5174`
-- JWT token is stored in browser `localStorage`
-- API client auto-attaches token and logs user out on `401`
-- DB credentials and JWT secret are configurable via environment variables (`DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`) with local defaults in `application.yaml`
+- CORS is strictly configured to allow Vercel origins and local dev (`5173`).
+- JWT token and Refresh Tokens are securely handled by the API client.
+- The repository utilizes fully automated Spring Boot `ddl-auto: update` configuration to dynamically generate schemas on fresh deployments.
