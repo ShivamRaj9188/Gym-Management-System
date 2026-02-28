@@ -11,7 +11,5 @@ RUN ./mvnw clean package -DskipTests -q
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
 EXPOSE 8080
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Dserver.port=8080", "-jar", "app.jar"]
