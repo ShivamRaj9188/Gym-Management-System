@@ -1,162 +1,75 @@
 # Gym Management System
 
-**🚀 Live Demo:** [https://gym-management-system-blond.vercel.app](https://gym-management-system-blond.vercel.app)
-**⚙️ Backend API:** `https://gym-backend-production-2509.up.railway.app`
+A comprehensive, full-stack enterprise platform designed for gym administration and member lifecycle management.
+The application operates on a decoupled architecture utilizing a Spring Boot REST API for backend services and a React Single Page Application (SPA) for the frontend interface.
 
-Full-stack gym operations platform with:
-- Spring Boot REST API (`gym-backend`) deployed on **Railway**
-- React + Vite frontend (`gym-frontend`) deployed on **Vercel**
-- PostgreSQL database hosted on **Supabase**
+**Live Application:** [https://gym-management-system-blond.vercel.app](https://gym-management-system-blond.vercel.app)
+**Backend API:** `https://gym-backend-production-2509.up.railway.app`
 
-It covers member management, trainer assignment, attendance, plans, payments, dashboard analytics, and admin-controlled user verification.
+## 1. System Architecture
 
-## Tech Stack
+The application is engineered using the following technology stack:
 
-- Backend: Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA, Maven, JWT (`jjwt`)
-- Frontend: React 19, React Router, Axios, Vite, Bootstrap 5
-- Database: PostgreSQL
+- **Frontend:** React 19, Vite, React Router, Axios, Bootstrap 5. Deployed statically on Vercel.
+- **Backend:** Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA. Containerized and deployed on Railway.
+- **Database:** PostgreSQL. Hosted on Supabase utilizing optimal connection pooling.
+- **Security:** Stateless JSON Web Token (JWT) architecture leveraging `jjwt`.
 
-## Project Structure
+## 2. Core Functional Modules
 
-```text
-Gym Mangement system/
-├── gym-backend/
-├── gym-frontend/
-├── .gitignore
-├── PROJECT_REPORT.md
-└── README.md
-```
+- **Authentication & Security:** JWT-driven access control featuring secure Refresh Token rotation, programmatic Rate Limiting, and XSS payload sanitization.
+- **Administrative Control:** Dedicated workflows mapping to the `ROLE_ADMIN` authority, handling user verification, suspension, and account termination.
+- **Operational Dashboard:** Real-time aggregation of active memberships, daily check-ins, trainer assignments, and revenue metrics.
+- **Member & Subscription Management:** Full CRUD operations managing the association between registered members and their active subscription tiers.
+- **Trainer Allocation:** Bidirectional mapping associating specialized trainers with respective gym members.
+- **Attendance Tracking:** Time-stamped event logging for member facility access (check-in / check-out).
+- **Financial Tracking:** Centralized ledger for tracking membership dues, outstanding balances, and payment status updates.
 
-## Core Features
+## 3. Security Specifications
 
-- **Security & Auth:** JWT Authentication with Refresh Tokens, Rate Limiting, and XSS Sanitization.
-- **User Verification Flow:** New non-admin users require admin verification before login.
-- **Admin User Management:** List users, verify/unverify users, delete non-admin users.
-- **Dashboard:** Total members, active members, trainers, attendance count, paid revenue.
-- **Member + Plan Management:** CRUD operations and member-plan linking.
-- **Trainer Assignment:** Assign/unassign trainers to members.
-- **Attendance Tracking:** Mark check-in/check-out and filter by member/date.
-- **Payment Tracking:** Add payments, filter status/member, update payment status.
-- **Global Error Handling:** Consistent API error envelopes across all endpoints.
+- **Endpoint Protection:** Public access is strictly localized to `/api/auth/**`. All operational endpoints demand a valid `Authorization: Bearer <token>` header.
+- **Role-Based Access Control (RBAC):** Privileged endpoints (`/api/admin/**`) enforce strict `ROLE_ADMIN` validation.
+- **Cross-Origin Resource Sharing (CORS):** The backend API explicitly whitelists the Vercel production origin and standard local development ports (`5173`, `5174`) to prevent unauthorized cross-origin execution.
 
-## Authentication and Authorization
+## 4. Deployment Prerequisites
 
-- Auth endpoints are public: `/api/auth/**`
-- All other APIs require `Authorization: Bearer <jwt>`
-- Admin APIs (`/api/admin/**`) require `ROLE_ADMIN`
-- Frontend route guard supports both authenticated and admin-only routes (`ProtectedRoute`)
+To build and run the application locally, the following environments are required:
+- Java SE 17 or higher
+- Node.js 18 or higher (with NPM)
+- PostgreSQL 14 or higher
 
-## Prerequisites
+## 5. Production Environment Configuration
 
-- Java 17+
-- Node.js 18+ and npm
-- PostgreSQL 14+ (or compatible)
+The application is designed to be configured externally via environment variables to uphold 12-factor application principles.
 
-## Backend Setup (`gym-backend`)
+### Backend Requirements (Railway)
+Ensure the following variables are injected into the production container:
+- `SPRING_DATASOURCE_URL`: The fully qualified PostgreSQL JDBC connection string.
+- `DB_USERNAME`: Database privileged user.
+- `DB_PASSWORD`: Corresponding privileged password.
+- `JWT_SECRET`: A cryptographic secret key (minimum 256-bit) utilized for HMAC signing.
+- `CORS_ORIGINS`: Defines the allowed frontend hosts (e.g., `https://gym-management-system-blond.vercel.app`).
 
-1. Create a PostgreSQL database:
-```sql
-CREATE DATABASE testdb;
-```
-2. Configure DB credentials (choose one):
-- **Environment variables** (recommended): set `DB_USERNAME` and `DB_PASSWORD`
-- **Direct config**: edit `gym-backend/src/main/resources/application.yaml` → `spring.datasource.username` / `password`
+*Note: The backend utilizes Spring Boot's `ddl-auto: update` configuration in the primary production profile to dynamically ensure database schema correctness upon deployment.*
 
-3. Configure JWT secret (choose one):
-- **Environment variable** (recommended): set `JWT_SECRET`
-- **Direct config**: edit `jwt.secret` in `application.yaml`
+### Frontend Requirements (Vercel)
+Ensure the following variable is defined during the static build phase:
+- `VITE_API_URL`: The fully qualified URI to the backend REST API, terminating with the base path (`https://gym-backend-production-2509.up.railway.app/api`).
 
-4. Start backend:
-```bash
-cd gym-backend
-./mvnw spring-boot:run
-```
+## 6. Local Build Instructions
 
-Backend URL: `http://localhost:9999`
-
-### Database Alignment Migration (auto-runs)
-
-This repo includes an idempotent alignment script at:
-- `gym-backend/src/main/resources/db/schema-alignment.sql`
-
-It runs automatically on backend startup (configured in `application.yaml`) and keeps DB schema/data aligned with validations:
-- drops legacy `member.plan_type` if present
-- normalizes/repairs invalid member/trainer email/phone data for old databases
-- enforces `NOT NULL` for required member/trainer fields
-- creates unique indexes for member/trainer `email` and `phone`
-- adds payment check constraints for valid status/method and due-date consistency
-
-So after cloning and running backend, a fresh or older DB is aligned automatically.
-
-## Seeded Data
-
-On startup, the app seeds default data:
-- Admin user: `admin` / `admin123` (BCrypt-encoded password)
-- Plans: Basic, Premium, Elite
-- Trainers: two sample trainers
-
-## Frontend Setup (`gym-frontend`)
-
-1. Install dependencies:
+**Frontend Execution:**
 ```bash
 cd gym-frontend
 npm install
-```
-2. Start dev server:
-```bash
-npm run dev
-```
-
-Frontend URL: `http://localhost:5173`
-
-Frontend API base URL is configured in `gym-frontend/src/services/api.js`:
-- `http://localhost:9999/api`
-
-## Main API Groups
-
-- Auth: `/api/auth/*`
-- Admin users: `/api/admin/users/*`
-- Dashboard: `/api/home/dashboard`
-- Members: `/api/members/*`
-- Trainers: `/api/trainers/*`
-- Plans: `/api/plans/*`
-- Attendance: `/api/attendance/*`
-- Payments: `/api/payments/*`
-
-## Build and Deploy for Production
-
-### Architecture
-- **Frontend** is hosted statically on **Vercel**.
-- **Backend** is deployed as a Dockerized service on **Railway**.
-- **Database** is a robust connection-pooled PostgreSQL instance on **Supabase**.
-
-### Environment Variables Required
-**Backend (Railway):**
-- `SPRING_DATASOURCE_URL`: Supabase JDBC URL (`jdbc:postgresql://...`)
-- `DB_USERNAME` & `DB_PASSWORD`: Supabase credentials
-- `JWT_SECRET`: Secure 256-bit+ secret key
-- `CORS_ORIGINS`: `https://gym-management-system-blond.vercel.app`
-
-**Frontend (Vercel):**
-- `VITE_API_URL`: `https://gym-backend-production-2509.up.railway.app/api`
-
-### Local Production Build
-Frontend:
-```bash
-cd gym-frontend
 npm run build
+# The optimized production build is generated in gym-frontend/dist/
 ```
-Build output: `gym-frontend/dist`
 
-Backend:
+**Backend Execution:**
 ```bash
 cd gym-backend
 ./mvnw clean package
+# The executable JAR is initialized in gym-backend/target/
+java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
 ```
-Jar output: `gym-backend/target`
-
-## Current Notes
-
-- CORS is strictly configured to allow Vercel origins and local dev (`5173`).
-- JWT token and Refresh Tokens are securely handled by the API client.
-- The repository utilizes fully automated Spring Boot `ddl-auto: update` configuration to dynamically generate schemas on fresh deployments.
