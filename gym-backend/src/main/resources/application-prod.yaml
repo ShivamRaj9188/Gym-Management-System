@@ -22,7 +22,7 @@ spring:
       keepalive-time: 60000
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: false
     defer-datasource-initialization: false
     properties:
