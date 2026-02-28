@@ -8,7 +8,7 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
+    url: ${SPRING_DATASOURCE_URL}?sslmode=require&prepareThreshold=0
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -20,12 +20,9 @@ spring:
       idle-timeout: 300000
       max-lifetime: 600000
       keepalive-time: 60000
-      data-source-properties:
-        ssl: true
-        sslmode: require
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     defer-datasource-initialization: false
     properties:
