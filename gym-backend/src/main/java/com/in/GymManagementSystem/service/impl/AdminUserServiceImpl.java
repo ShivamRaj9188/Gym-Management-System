@@ -7,6 +7,8 @@ import com.in.GymManagementSystem.repository.UserRepository;
 import com.in.GymManagementSystem.service.AdminUserService;
 import com.in.GymManagementSystem.service.AuditService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
     private final AuditService auditService;
+
+    @Override
+    public Page<AdminUserDTO> getAllUsersPaged(Pageable pageable) {
+        return userRepository.findAll(pageable).map(this::toDto);
+    }
 
     @Override
     public List<AdminUserDTO> getAllUsers() {

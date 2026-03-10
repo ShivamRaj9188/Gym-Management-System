@@ -8,17 +8,20 @@ function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const loadUsers = async () => {
-    const data = await getUsers();
-    setUsers(data);
+  const loadUsers = async (p = page) => {
+    const data = await getUsers(p);
+    setUsers(data.content || []);
+    setTotalPages(data.totalPages || 0);
   };
 
   useEffect(() => {
     const init = async () => {
       try {
         setLoading(true);
-        await loadUsers();
+        await loadUsers(0);
       } catch (err) {
         setError(getErrorMessage(err));
       } finally {
@@ -61,6 +64,16 @@ function AdminUsers() {
       await deleteUser(id);
       setMessage("User deleted.");
       await loadUsers();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const handlePageChange = async newPage => {
+    clearMessages();
+    try {
+      setPage(newPage);
+      await loadUsers(newPage);
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -123,6 +136,26 @@ function AdminUsers() {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination-controls">
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              disabled={page === 0}
+              onClick={() => handlePageChange(page - 1)}
+            >
+              Prev
+            </button>
+            <span className="page-info">Page {page + 1} of {totalPages}</span>
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              disabled={page >= totalPages - 1}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

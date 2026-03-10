@@ -3,10 +3,11 @@ package com.in.GymManagementSystem.controller;
 import com.in.GymManagementSystem.dto.AdminUserDTO;
 import com.in.GymManagementSystem.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -16,8 +17,12 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @GetMapping
-    public ResponseEntity<List<AdminUserDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminUserService.getAllUsers());
+    public ResponseEntity<Page<AdminUserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "username") String sort) {
+        size = Math.min(size, 100);
+        return ResponseEntity.ok(adminUserService.getAllUsersPaged(PageRequest.of(page, size, Sort.by(sort))));
     }
 
     @PutMapping("/{id}/verify")

@@ -6,6 +6,8 @@ import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.PlanRepository;
 import com.in.GymManagementSystem.service.PlanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,11 @@ import java.util.stream.Collectors;
 public class PlanServiceImpl implements PlanService {
 
     private final PlanRepository planRepository;
+
+    @Override
+    public Page<PlanDTO> getAllPlansPaged(Pageable pageable) {
+        return planRepository.findAll(pageable).map(this::convertToDTO);
+    }
 
     @Override
     public List<PlanDTO> getAllPlans() {

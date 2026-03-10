@@ -4,6 +4,9 @@ import com.in.GymManagementSystem.dto.PlanDTO;
 import com.in.GymManagementSystem.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +21,12 @@ public class PlanController {
     private final PlanService planService;
 
     @GetMapping
-    public ResponseEntity<List<PlanDTO>> getAllPlans() {
-        return ResponseEntity.ok(planService.getAllPlans());
+    public ResponseEntity<Page<PlanDTO>> getAllPlans(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sort) {
+        size = Math.min(size, 100);
+        return ResponseEntity.ok(planService.getAllPlansPaged(PageRequest.of(page, size, Sort.by(sort))));
     }
 
     @GetMapping("/active")
