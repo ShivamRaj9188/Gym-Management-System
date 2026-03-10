@@ -11,19 +11,21 @@ The application operates on a decoupled architecture utilizing a Spring Boot RES
 The application is engineered using the following technology stack:
 
 - **Frontend:** React 19, Vite, React Router, Axios, Bootstrap 5. Deployed statically on Vercel.
-- **Backend:** Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA. Containerized and deployed on Railway.
-- **Database:** PostgreSQL. Hosted on Supabase utilizing optimal connection pooling.
+- **Backend:** Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA, Caffeine Cache. Containerized and deployed on Railway.
+- **Database:** PostgreSQL. Hosted on Supabase utilizing HikariCP with an optimized connection pool (10) and Keep-Alive mechanisms.
 - **Security:** Stateless JSON Web Token (JWT) architecture leveraging `jjwt`.
 
 ## 2. Core Functional Modules
 
 - **Authentication & Security:** JWT-driven access control featuring secure Refresh Token rotation, programmatic Rate Limiting, and XSS payload sanitization.
 - **Administrative Control:** Dedicated workflows mapping to the `ROLE_ADMIN` authority, handling user verification, suspension, and account termination.
-- **Operational Dashboard:** Real-time aggregation of active memberships, daily check-ins, trainer assignments, and revenue metrics.
-- **Member & Subscription Management:** Full CRUD operations managing the association between registered members and their active subscription tiers.
+- **Operational Dashboard:** Real-time aggregation of active memberships, daily check-ins, trainer assignments, and revenue metrics (Hardware-optimized with Caffeine in-memory caching).
+- **Member & Subscription Management:** Full paginated CRUD operations managing the association between registered members and their active subscription tiers.
 - **Trainer Allocation:** Bidirectional mapping associating specialized trainers with respective gym members.
-- **Attendance Tracking:** Time-stamped event logging for member facility access (check-in / check-out).
+- **Attendance Tracking:** Time-stamped event logging for member facility access (check-in / check-out), utilizing paginated views.
 - **Financial Tracking:** Centralized ledger for tracking membership dues, outstanding balances, and payment status updates.
+- **Automated Notifications:** Background cron tasks automatically dispatch email reminders for overdue payments.
+- **Data Export:** Secure endpoints allowing administrators to export complete member records to PDF and Excel formats.
 
 ## 3. Security Specifications
 

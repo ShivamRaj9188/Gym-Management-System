@@ -30,17 +30,17 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 - Global Error Handling via consistent REST payloads
 - Role-aware route and API protection
 - Admin user management (verify/unverify/delete non-admin users)
-- Plan, member, and trainer CRUD workflows
+- Plan, member, trainer, attendance, and payment CRUD workflows with **Pagination**
 - Trainer-to-member assignment management
-- Attendance check-in/check-out workflows
-- Payment create/filter/status-update workflows
-- Dashboard KPIs: members, trainers, attendance, paid revenue
+- Dashboard KPIs with **In-memory Caching** (Members, trainers, attendance, revenue)
+- Automated Email Reminders for overdue payments
+- PDF and Excel data exports for Administrators
+- Base Integration testing for security validation
+- Automated database keep-alive ping to prevent serverless DB sleeping
 
 ### Out of Scope (Current Version)
 - Granular RBAC beyond current ADMIN/USER pattern
-- Reporting exports (PDF/Excel)
-- Notification/reminder engine
-- Full automated test suite and CI/CD automation
+- Full CI/CD automation pipeline
 
 ## 5. Technology Stack
 ### Backend
@@ -207,20 +207,18 @@ Runs on: `http://localhost:5173`
 - **Production:** Hosted on **Supabase**. Configure `SPRING_DATASOURCE_URL`, `DB_USERNAME`, and `DB_PASSWORD` via environment variables. The `application-prod.yaml` ensures `ddl-auto: update` dynamically creates all schemas.
 
 ## 13. Testing Status
-- Backend has only base scaffold test class (`GymManagementSystemApplicationTests`).
+- The backend suite includes foundational integration tests utilizing `@SpringBootTest` and `MockMvc` to validate endpoint security and context initialization.
 - Major business modules currently rely on manual functional validation.
-- Automated unit and integration coverage is still pending.
+- Automated unit coverage expansion is planned.
 
 ## 14. Current Limitations / Risks
-- No pagination on list-heavy endpoints.
-- No audit trail for sensitive admin operations.
+- No audit trail for sensitive admin operations yet.
 
 ## 15. Future Enhancements
 - Introduce fine-grained role/permission model.
-- Add pagination, sorting, and richer filters.
-- Add exportable reports and trend analytics.
-- Add reminders for expiring plans and overdue dues.
-- Add unit/integration tests with CI pipeline.
+- Add richer filtering criteria to paginated views.
+- Exportable trend analytics and charts on the dashboard.
+- CI/CD automation.
 
 ## 16. Conclusion
-The current version delivers a robust gym operations platform with secured API access, admin-controlled user activation, and complete foundational business modules. It is well-positioned for production hardening through enhanced token strategy, testing automation, and deployment standardization.
+The current version delivers a highly scalable, robust gym operations platform. Recent capacity improvements (connection pooling, dashboard caching) ensure the API remains highly responsive under load within free-tier limits, while features like automated reminders, PDF/Excel exports, and global pagination provide an enterprise-grade administration experience.
