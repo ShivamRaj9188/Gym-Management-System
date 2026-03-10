@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMembers } from "../services/MemberService";
 import { getPayments, getPaymentsByMember, getPaymentsByStatus, createPayment, updatePaymentStatus, deletePayment } from "../services/PaymentService";
-import { getPlans } from "../services/PlanService";
+import { getActivePlans } from "../services/PlanService";
 import { isAdmin } from "../services/AuthService";
 import { isValidPaymentMethod, isValidPaymentStatus } from "../utils/validators";
 
@@ -42,7 +42,7 @@ function PaymentTracking() {
   const [error, setError] = useState("");
 
   const loadInitialData = async () => {
-    const [paymentRes, memberRes, planRes] = await Promise.all([getPayments(), getMembers(0, 100), getPlans()]);
+    const [paymentRes, memberRes, planRes] = await Promise.all([getPayments(), getMembers(0, 100), getActivePlans()]);
     setPayments(paymentRes.content || paymentRes);
     setMembers(memberRes.content || memberRes);
     setPlans(planRes);
