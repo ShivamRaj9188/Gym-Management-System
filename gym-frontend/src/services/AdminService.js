@@ -1,8 +1,8 @@
 import apiClient from "./api";
 
-export const getUsers = async () => {
-  const response = await apiClient.get("/admin/users");
-  return response.data;
+export const getUsers = async (page = 0, size = 20) => {
+  const response = await apiClient.get("/admin/users", { params: { page, size, sort: "username" } });
+  return response.data; // Page<AdminUserDTO>
 };
 
 export const verifyUser = async id => {

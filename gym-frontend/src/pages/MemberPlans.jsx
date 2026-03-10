@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createMember, deleteMember, getMembers, updateMember } from "../services/MemberService";
-import { createPlan, deletePlan, getPlans, updatePlan } from "../services/PlanService";
+import { createPlan, deletePlan, getActivePlans, getPlans, updatePlan } from "../services/PlanService";
 import { isValidEmail, isValidName, isValidPhone, isValidPlanName } from "../utils/validators";
 
 const emptyPlanForm = {
@@ -23,6 +23,7 @@ const getErrorMessage = error => error?.response?.data?.message || "Something we
 
 function MemberPlans() {
   const [plans, setPlans] = useState([]);
+  const [activePlans, setActivePlans] = useState([]);
   const [members, setMembers] = useState([]);
   const [planForm, setPlanForm] = useState(emptyPlanForm);
   const [memberForm, setMemberForm] = useState(emptyMemberForm);
@@ -33,12 +34,20 @@ function MemberPlans() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [planPage, setPlanPage] = useState(0);
+  const [planTotalPages, setPlanTotalPages] = useState(0);
   const [memberPage, setMemberPage] = useState(0);
   const [memberTotalPages, setMemberTotalPages] = useState(0);
 
-  const loadData = async (page = memberPage) => {
-    const [planRes, memberRes] = await Promise.all([getPlans(), getMembers(page)]);
-    setPlans(planRes);
+  const loadData = async (pp = planPage, mp = memberPage) => {
+    const [planRes, activePlanRes, memberRes] = await Promise.all([
+      getPlans(pp),
+      getActivePlans(),
+      getMembers(mp),
+    ]);
+    setPlans(planRes.content || []);
+    setPlanTotalPages(planRes.totalPages || 0);
+    setActivePlans(activePlanRes);
     setMembers(memberRes.content || []);
     setMemberTotalPages(memberRes.totalPages || 0);
   };
@@ -381,6 +390,25 @@ function MemberPlans() {
                 </tbody>
               </table>
             </div>
+            {planTotalPages > 1 && (
+              <div className="pagination-controls">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={planPage === 0}
+                  onClick={() => { setPlanPage(p => p - 1); loadData(planPage - 1, memberPage); }}
+                >
+                  Prev
+                </button>
+                <span className="page-info">Page {planPage + 1} of {planTotalPages}</span>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={planPage >= planTotalPages - 1}
+                  onClick={() => { setPlanPage(p => p + 1); loadData(planPage + 1, memberPage); }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="col-12 col-xl-6">
@@ -426,7 +454,7 @@ function MemberPlans() {
                     onChange={e => setMemberForm(prev => ({ ...prev, planId: e.target.value }))}
                   >
                     <option value="">No Plan</option>
-                    {plans.map(plan => (
+                    {activePlans.map(plan => (
                       <option key={plan.id} value={plan.id}>
                         {plan.name}
                       </option>
