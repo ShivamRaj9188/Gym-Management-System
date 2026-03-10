@@ -498,10 +498,10 @@ function MemberPlans() {
                   <span className="fw-medium">Export All Members Data</span>
                   <div className="d-flex gap-2">
                     <button className="btn btn-sm btn-outline-danger" onClick={() => exportMembersToPdf()}>
-                      📄 Export PDF
+                      Export PDF
                     </button>
                     <button className="btn btn-sm btn-outline-success" onClick={() => exportMembersToExcel()}>
-                      📊 Export Excel
+                      Export Excel
                     </button>
                   </div>
                 </div>
