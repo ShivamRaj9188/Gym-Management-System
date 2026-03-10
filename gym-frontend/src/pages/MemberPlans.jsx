@@ -492,6 +492,22 @@ function MemberPlans() {
               </div>
             </div>
 
+            {isAdmin() && (
+              <div className="card border-0 bg-body-tertiary mt-3">
+                <div className="card-body d-flex justify-content-between align-items-center">
+                  <span className="fw-medium">Export All Members Data</span>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => exportMembersToPdf()}>
+                      📄 Export PDF
+                    </button>
+                    <button className="btn btn-sm btn-outline-success" onClick={() => exportMembersToExcel()}>
+                      📊 Export Excel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="table-responsive mt-3">
               <table className="table table-sm align-middle">
                 <thead>
