@@ -1,6 +1,7 @@
 package com.in.GymManagementSystem.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 
 import com.in.GymManagementSystem.dto.HomeDashboardDTO;
@@ -22,6 +23,7 @@ public class HomeServiceImpl implements HomeService {
     private final PaymentRepository paymentRepository;
 
     @Override
+    @Cacheable(value = "dashboard")
     public HomeDashboardDTO getDashboardData() {
 
         long totalMembers = memberRepository.count();
@@ -37,7 +39,6 @@ public class HomeServiceImpl implements HomeService {
                 activeMembers,
                 totalTrainers,
                 todayAttendance,
-                totalRevenue
-        );
+                totalRevenue);
     }
 }

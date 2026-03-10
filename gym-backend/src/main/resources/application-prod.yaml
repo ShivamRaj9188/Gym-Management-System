@@ -7,6 +7,17 @@ server:
     include-binding-errors: never
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:gym@example.com}
+    password: ${MAIL_PASSWORD:***REMOVED***}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   datasource:
     url: ${SPRING_DATASOURCE_URL}?sslmode=require&prepareThreshold=0
     username: ${DB_USERNAME}
@@ -15,8 +26,8 @@ spring:
     hikari:
       connection-timeout: 30000
       initialization-fail-timeout: -1
-      maximum-pool-size: 5
-      minimum-idle: 1
+      maximum-pool-size: 10
+      minimum-idle: 2
       idle-timeout: 300000
       max-lifetime: 600000
       keepalive-time: 60000
@@ -31,6 +42,10 @@ spring:
   sql:
     init:
       mode: never
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=50,expireAfterWrite=30s
 
 jwt:
   secret: ${JWT_SECRET:change-this-secret-to-a-long-random-string}
