@@ -28,3 +28,25 @@ export const removeTrainerFromMember = async (memberId, trainerId) => {
   const response = await apiClient.delete(`/members/${memberId}/trainers/${trainerId}`);
   return response.data;
 };
+
+export const exportMembersToExcel = async () => {
+  const response = await apiClient.get('/export/members/excel', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'members.xlsx');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+export const exportMembersToPdf = async () => {
+  const response = await apiClient.get('/export/members/pdf', { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'members.pdf');
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
