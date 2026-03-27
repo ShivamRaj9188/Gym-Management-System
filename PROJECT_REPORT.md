@@ -4,7 +4,7 @@
 The Gym Management System is a full-stack web application to digitize gym operations including member lifecycle management, subscription plans, trainer assignment, attendance logging, payment tracking, and operational dashboard analytics.
 
 The solution is composed of:
-- Backend REST API (`gym-backend`) built with Spring Boot + PostgreSQL, deployed via Docker on **Railway**.
+- Backend REST API (`gym-backend`) built with Spring Boot + PostgreSQL, deployed via Docker on **Hugging Face Spaces**.
 - Frontend SPA (`gym-frontend`) built with React + Vite + Axios, deployed statically on **Vercel**.
 - Database hosted on a scaled connection pool via **Supabase**.
 
@@ -32,8 +32,9 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 - Admin user management (verify/unverify/delete non-admin users)
 - Plan, member, trainer, attendance, and payment CRUD workflows with **Pagination**
 - Trainer-to-member assignment management
-- Dashboard KPIs with **In-memory Caching** (Members, trainers, attendance, revenue)
-- Automated Email Reminders for overdue payments
+- Dashboard KPIs with **Multi-level Configured Caching** (Members, trainers, attendance, revenue)
+- Asynchronous Automated Email Reminders for overdue payments
+- Interactive API Documentation via Swagger UI / OpenAPI 3
 - PDF and Excel data exports for Administrators
 - Base Integration testing for security validation
 - Automated database keep-alive ping to prevent serverless DB sleeping
@@ -52,6 +53,7 @@ Many gyms rely on manual registers and disconnected tools, creating data inconsi
 - JWT (`io.jsonwebtoken:jjwt`)
 - Maven
 - PostgreSQL JDBC driver
+- springdoc-openapi (Swagger UI)
 - Lombok
 
 > Note: Thymeleaf is not used — the backend is a pure REST API.
@@ -165,6 +167,7 @@ Relationships:
 - Plans: `/api/plans/*`
 - Attendance: `/api/attendance/*`
 - Payments: `/api/payments/*`
+- API Docs: `/v3/api-docs` & `/swagger-ui/index.html`
 
 ## 10. Frontend Features and UX
 - Protected route handling with optional admin gating
@@ -221,4 +224,4 @@ Runs on: `http://localhost:5173`
 - CI/CD automation.
 
 ## 16. Conclusion
-The current version delivers a highly scalable, robust gym operations platform. Recent capacity improvements (connection pooling, dashboard caching) ensure the API remains highly responsive under load within free-tier limits, while features like automated reminders, PDF/Excel exports, and global pagination provide an enterprise-grade administration experience.
+The current version delivers a highly scalable, robust gym operations platform. Recent capacity improvements (granular multi-level caching, asynchronous email handling, Swagger API documentation, and Docker deployment on Hugging Face Spaces) ensure the API remains highly responsive under load within free-tier limits, while features like automated reminders, PDF/Excel exports, and global pagination provide an enterprise-grade administration experience.

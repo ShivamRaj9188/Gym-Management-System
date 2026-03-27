@@ -4,14 +4,15 @@ A comprehensive, full-stack enterprise platform designed for gym administration 
 The application operates on a decoupled architecture utilizing a Spring Boot REST API for backend services and a React Single Page Application (SPA) for the frontend interface.
 
 **Live Application:** [https://gym-management-system-blond.vercel.app](https://gym-management-system-blond.vercel.app)
-**Backend API:** `https://gym-backend-production-2509.up.railway.app`
+**Backend API:** `https://shivam9188-gym-backend.hf.space`
+**API Documentation (Swagger):** `https://shivam9188-gym-backend.hf.space/swagger-ui/index.html`
 
 ## 1. System Architecture
 
 The application is engineered using the following technology stack:
 
 - **Frontend:** React 19, Vite, React Router, Axios, Bootstrap 5. Deployed statically on Vercel.
-- **Backend:** Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA, Caffeine Cache. Containerized and deployed on Railway.
+- **Backend:** Java 17, Spring Boot 3.5.x, Spring Security, Spring Data JPA, Caffeine Cache (with granular TTLs). Containerized and deployed on Hugging Face Spaces.
 - **Database:** PostgreSQL. Hosted on Supabase utilizing HikariCP with an optimized connection pool (10) and Keep-Alive mechanisms.
 - **Security:** Stateless JSON Web Token (JWT) architecture leveraging `jjwt`.
 
@@ -24,7 +25,7 @@ The application is engineered using the following technology stack:
 - **Trainer Allocation:** Bidirectional mapping associating specialized trainers with respective gym members.
 - **Attendance Tracking:** Time-stamped event logging for member facility access (check-in / check-out), utilizing paginated views.
 - **Financial Tracking:** Centralized ledger for tracking membership dues, outstanding balances, and payment status updates.
-- **Automated Notifications:** Background cron tasks automatically dispatch email reminders for overdue payments.
+- **Automated Notifications:** Asynchronous background cron tasks automatically dispatch email reminders for overdue payments without blocking the main server threads.
 - **Data Export:** Secure endpoints allowing administrators to export complete member records to PDF and Excel formats.
 
 ## 3. Security Specifications
@@ -44,8 +45,8 @@ To build and run the application locally, the following environments are require
 
 The application is designed to be configured externally via environment variables to uphold 12-factor application principles.
 
-### Backend Requirements (Railway)
-Ensure the following variables are injected into the production container:
+### Backend Requirements (Hugging Face Spaces)
+Ensure the following variables are injected into the production container (Space Settings -> Variables and secrets):
 - `SPRING_DATASOURCE_URL`: The fully qualified PostgreSQL JDBC connection string.
 - `DB_USERNAME`: Database privileged user.
 - `DB_PASSWORD`: Corresponding privileged password.
@@ -56,7 +57,7 @@ Ensure the following variables are injected into the production container:
 
 ### Frontend Requirements (Vercel)
 Ensure the following variable is defined during the static build phase:
-- `VITE_API_URL`: The fully qualified URI to the backend REST API, terminating with the base path (`https://gym-backend-production-2509.up.railway.app/api`).
+- `VITE_API_URL`: The fully qualified URI to the backend REST API, terminating with the base path (`https://shivam9188-gym-backend.hf.space/api`).
 
 ## 6. Local Build Instructions
 
