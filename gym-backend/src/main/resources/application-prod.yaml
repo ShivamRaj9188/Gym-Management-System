@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:7860}
   address: 0.0.0.0
   error:
     include-message: never
@@ -42,10 +42,6 @@ spring:
   sql:
     init:
       mode: never
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=50,expireAfterWrite=30s
 
 jwt:
   secret: ${JWT_SECRET:change-this-secret-to-a-long-random-string}

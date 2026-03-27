@@ -6,6 +6,8 @@ import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.TrainerRepository;
 import com.in.GymManagementSystem.service.TrainerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
 
     @Override
+    @Cacheable(value = "trainers", key = "'all'")
     public List<TrainerDTO> getAllTrainers() {
         return trainerRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -30,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @Cacheable(value = "trainers", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<TrainerDTO> getAllTrainersPaged(Pageable pageable) {
         return trainerRepository.findAll(pageable).map(this::convertToDTO);
     }
@@ -43,6 +47,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"trainers", "dashboard"}, allEntries = true)
     public TrainerDTO createTrainer(TrainerDTO trainerDTO) {
         String normalizedEmail = normalizeEmail(trainerDTO.getEmail());
         String normalizedPhone = normalizePhone(trainerDTO.getPhone());
@@ -61,6 +66,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"trainers", "dashboard"}, allEntries = true)
     public TrainerDTO updateTrainer(Long id, TrainerDTO trainerDTO) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Trainer not found"));
@@ -78,6 +84,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @CacheEvict(value = {"trainers", "dashboard"}, allEntries = true)
     public void deleteTrainer(Long id) {
         trainerRepository.deleteById(id);
     }

@@ -6,6 +6,8 @@ import com.in.GymManagementSystem.exception.ResourceNotFoundException;
 import com.in.GymManagementSystem.repository.PlanRepository;
 import com.in.GymManagementSystem.service.PlanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,13 @@ public class PlanServiceImpl implements PlanService {
     private final PlanRepository planRepository;
 
     @Override
+    @Cacheable(value = "plans", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<PlanDTO> getAllPlansPaged(Pageable pageable) {
         return planRepository.findAll(pageable).map(this::convertToDTO);
     }
 
     @Override
+    @Cacheable(value = "plans", key = "'all'")
     public List<PlanDTO> getAllPlans() {
         return planRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -33,6 +37,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @Cacheable(value = "plans", key = "'active'")
     public List<PlanDTO> getActivePlans() {
         return planRepository.findByActiveTrue().stream()
                 .map(this::convertToDTO)
@@ -48,6 +53,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "plans", allEntries = true)
     public PlanDTO createPlan(PlanDTO planDTO) {
         Plan plan = Plan.builder()
                 .name(planDTO.getName())
@@ -63,6 +69,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "plans", allEntries = true)
     public PlanDTO updatePlan(Long id, PlanDTO planDTO) {
         Plan plan = planRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Plan not found"));
@@ -78,6 +85,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    @CacheEvict(value = "plans", allEntries = true)
     public void deletePlan(Long id) {
         planRepository.deleteById(id);
     }

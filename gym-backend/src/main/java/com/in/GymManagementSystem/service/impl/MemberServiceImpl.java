@@ -10,6 +10,8 @@ import com.in.GymManagementSystem.repository.PlanRepository;
 import com.in.GymManagementSystem.repository.TrainerRepository;
 import com.in.GymManagementSystem.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class MemberServiceImpl implements MemberService {
     private final TrainerRepository trainerRepository;
 
     @Override
+    @Cacheable(value = "members", key = "'all'")
     public List<MemberDTO> getAllMembers() {
         return memberRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -36,6 +39,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Cacheable(value = "members", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<MemberDTO> getAllMembersPaged(Pageable pageable) {
         return memberRepository.findAll(pageable).map(this::convertToDTO);
     }
@@ -49,6 +53,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"members", "dashboard"}, allEntries = true)
     public MemberDTO createMember(MemberDTO memberDTO) {
         String normalizedEmail = normalizeEmail(memberDTO.getEmail());
         String normalizedPhone = normalizePhone(memberDTO.getPhone());
@@ -73,6 +78,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"members", "dashboard"}, allEntries = true)
     public MemberDTO updateMember(Long id, MemberDTO memberDTO) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
@@ -98,12 +104,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @CacheEvict(value = {"members", "dashboard"}, allEntries = true)
     public void deleteMember(Long id) {
         memberRepository.deleteById(id);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = {"members", "trainers"}, allEntries = true)
     public MemberDTO assignTrainer(Long memberId, Long trainerId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
@@ -117,6 +125,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"members", "trainers"}, allEntries = true)
     public MemberDTO removeTrainer(Long memberId, Long trainerId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found"));

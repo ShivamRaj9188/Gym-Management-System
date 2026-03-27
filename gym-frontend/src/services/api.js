@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAuthToken, getStoredUser, logoutUser } from "./AuthService";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:9999/api";
+const API_BASE = "https://shivam9188-gym-backend.hf.space/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE,
