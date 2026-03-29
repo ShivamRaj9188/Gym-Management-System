@@ -79,3 +79,5 @@ java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
 
 ---
 *Note: Make sure your Git config is up-to-date before contributing.*
+
+<!-- Test commit to verify device authorization -->
