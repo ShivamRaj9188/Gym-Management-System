@@ -76,3 +76,6 @@ cd gym-backend
 # The executable JAR is initialized in gym-backend/target/
 java -jar gym-backend/target/GymManagementSystem-0.0.1-SNAPSHOT.jar
 ```
+
+---
+*Note: Make sure your Git config is up-to-date before contributing.*
