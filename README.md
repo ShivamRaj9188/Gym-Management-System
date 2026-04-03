@@ -7,6 +7,18 @@ The application operates on a decoupled architecture utilizing a Spring Boot RES
 **Backend API:** `https://shivam9188-gym-backend.hf.space`
 **API Documentation (Swagger):** `https://shivam9188-gym-backend.hf.space/swagger-ui/index.html`
 
+## Website Preview
+
+The following interface previews highlight the production dashboard experience and membership management workflow.
+
+### Dashboard Overview
+
+![Dashboard Overview](docs/previews/dashboard-overview.svg)
+
+### Member Plans & Member Management
+
+![Member Plans and Member Management](docs/previews/member-plans.svg)
+
 ## 1. System Architecture
 
 The application is engineered using the following technology stack:

@@ -1,0 +1,87 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#05070D"/>
+<g opacity="0.9">
+<circle cx="180" cy="500" r="360" fill="#672C2D"/>
+<circle cx="1120" cy="180" r="300" fill="#6D1F1E"/>
+<circle cx="1280" cy="740" r="430" fill="#0D1321"/>
+</g>
+<rect x="90" y="45" width="1420" height="205" rx="22" fill="#0A0E18" stroke="#1D2432"/>
+<rect x="90" y="45" width="1420" height="205" rx="22" fill="url(#paint0_linear)"/>
+<text x="118" y="88" fill="#B7BCCB" font-family="Arial, sans-serif" font-size="18">OPERATIONAL COMMAND CENTER</text>
+<text x="118" y="142" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="48" font-weight="700">Gym Management System</text>
+<text x="118" y="182" fill="#9BA3B4" font-family="Arial, sans-serif" font-size="22">Run memberships, trainers, attendance, and payments with a single high-performance dashboard.</text>
+<g fill="#0B111C" stroke="#30384A">
+<rect x="118" y="205" width="132" height="30" rx="15"/>
+<rect x="263" y="205" width="144" height="30" rx="15"/>
+<rect x="420" y="205" width="138" height="30" rx="15"/>
+</g>
+<text x="130" y="225" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Live Attendance</text>
+<text x="277" y="225" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Revenue Tracking</text>
+<text x="434" y="225" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Member Insights</text>
+<text x="1295" y="126" fill="#C8BFCA" font-family="Arial, sans-serif" font-size="20">Peak Performance Mode</text>
+<text x="1380" y="180" fill="#FFEDEF" font-family="Arial, sans-serif" font-size="50" font-weight="700">24/7</text>
+<rect x="90" y="270" width="1420" height="60" rx="8" fill="#0A0E18" stroke="#1D2432"/>
+<text x="115" y="308" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Dashboard</text>
+<rect x="215" y="280" width="135" height="40" rx="14" fill="#7B3437" stroke="#B04B4F"/>
+<text x="226" y="307" fill="#FFF1F1" font-family="Arial, sans-serif" font-size="18" font-weight="700">Member Plans</text>
+<text x="365" y="308" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Trainer Assignment</text>
+<text x="555" y="308" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Attendance</text>
+<text x="675" y="308" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Payment Tracking</text>
+<text x="900" y="308" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Admin Users</text>
+<text x="1360" y="308" fill="#8790A1" font-family="Arial, sans-serif" font-size="18">admin</text>
+<rect x="1420" y="280" width="72" height="40" rx="14" fill="#141A28" stroke="#B04B4F"/>
+<text x="1432" y="306" fill="#FFC5C5" font-family="Arial, sans-serif" font-size="17" font-weight="700">Logout</text>
+<rect x="90" y="350" width="1420" height="500" rx="22" fill="#070B14" stroke="#1D2432"/>
+<text x="118" y="405" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="40" font-weight="700">Member Plans</text>
+<rect x="118" y="435" width="620" height="335" rx="22" fill="#0E1420" stroke="#232C3D"/>
+<text x="138" y="475" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="22" font-weight="700">Create Plan</text>
+<rect x="138" y="498" width="580" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="155" y="524" fill="#808899" font-family="Arial, sans-serif" font-size="16">Plan name</text>
+<rect x="138" y="548" width="580" height="64" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="155" y="574" fill="#808899" font-family="Arial, sans-serif" font-size="16">Description</text>
+<rect x="138" y="622" width="270" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<rect x="428" y="622" width="290" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="155" y="648" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16">1</text>
+<text x="445" y="648" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16">0</text>
+<rect x="138" y="681" width="14" height="14" rx="3" fill="#2B6FF7"/>
+<path d="M141 688L145 692L151 684" stroke="white" stroke-width="2"/>
+<text x="163" y="694" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="16">Active</text>
+<rect x="138" y="716" width="115" height="38" rx="14" fill="#FF4B4F"/>
+<text x="151" y="741" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="700">Create Plan</text>
+<rect x="766" y="435" width="680" height="308" rx="22" fill="#0E1420" stroke="#232C3D"/>
+<text x="786" y="475" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="22" font-weight="700">Create Member</text>
+<rect x="786" y="498" width="640" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="803" y="524" fill="#808899" font-family="Arial, sans-serif" font-size="16">Member name</text>
+<rect x="786" y="548" width="310" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<rect x="1106" y="548" width="320" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="803" y="574" fill="#808899" font-family="Arial, sans-serif" font-size="16">Email</text>
+<text x="1123" y="574" fill="#808899" font-family="Arial, sans-serif" font-size="16">Phone</text>
+<rect x="786" y="598" width="640" height="40" rx="14" fill="#070B14" stroke="#232C3D"/>
+<text x="803" y="624" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="16">No Plan</text>
+<rect x="786" y="651" width="14" height="14" rx="3" fill="#2B6FF7"/>
+<path d="M789 658L793 662L799 654" stroke="white" stroke-width="2"/>
+<text x="811" y="664" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="16">Active</text>
+<rect x="786" y="689" width="155" height="38" rx="14" fill="#FF4B4F"/>
+<text x="801" y="714" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="700">Create Member</text>
+<rect x="766" y="760" width="680" height="56" rx="22" fill="#101622" stroke="#2A3142"/>
+<text x="785" y="795" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18">Export All Members Data</text>
+<rect x="1180" y="776" width="100" height="30" rx="12" fill="#161B28" stroke="#B04B4F"/>
+<rect x="1290" y="776" width="112" height="30" rx="12" fill="#161B28" stroke="#2B8D61"/>
+<text x="1193" y="796" fill="#FFC5C5" font-family="Arial, sans-serif" font-size="14" font-weight="700">Export PDF</text>
+<text x="1303" y="796" fill="#C2F1D4" font-family="Arial, sans-serif" font-size="14" font-weight="700">Export Excel</text>
+<g fill="#0A0F19" stroke="#D7D8DE">
+<rect x="118" y="835" width="620" height="1"/>
+</g>
+<text x="118" y="815" fill="#AEB4C2" font-family="Arial, sans-serif" font-size="15" font-weight="700">NAME</text>
+<text x="255" y="815" fill="#AEB4C2" font-family="Arial, sans-serif" font-size="15" font-weight="700">MONTHS</text>
+<text x="370" y="815" fill="#AEB4C2" font-family="Arial, sans-serif" font-size="15" font-weight="700">PRICE</text>
+<text x="485" y="815" fill="#AEB4C2" font-family="Arial, sans-serif" font-size="15" font-weight="700">STATUS</text>
+<text x="592" y="815" fill="#AEB4C2" font-family="Arial, sans-serif" font-size="15" font-weight="700">ACTIONS</text>
+<defs>
+<linearGradient id="paint0_linear" x1="90" y1="147.5" x2="1510" y2="147.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0A0E18"/>
+<stop offset="0.68" stop-color="#662021" stop-opacity="0.72"/>
+<stop offset="1" stop-color="#25141A"/>
+</linearGradient>
+</defs>
+</svg>

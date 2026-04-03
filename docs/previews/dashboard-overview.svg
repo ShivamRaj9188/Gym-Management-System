@@ -1,0 +1,63 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#05070D"/>
+<g opacity="0.9">
+<circle cx="180" cy="520" r="360" fill="#672C2D"/>
+<circle cx="1090" cy="180" r="280" fill="#6D1F1E"/>
+<circle cx="1220" cy="740" r="410" fill="#0D1321"/>
+</g>
+<rect x="95" y="55" width="1410" height="210" rx="22" fill="#0A0E18" stroke="#1D2432"/>
+<rect x="95" y="55" width="1410" height="210" rx="22" fill="url(#paint0_linear)"/>
+<text x="125" y="100" fill="#B7BCCB" font-family="Arial, sans-serif" font-size="18">OPERATIONAL COMMAND CENTER</text>
+<text x="125" y="155" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="48" font-weight="700">Gym Management System</text>
+<text x="125" y="195" fill="#9BA3B4" font-family="Arial, sans-serif" font-size="22">Run memberships, trainers, attendance, and payments with a single high-performance dashboard.</text>
+<g fill="#0B111C" stroke="#30384A">
+<rect x="125" y="220" width="132" height="30" rx="15"/>
+<rect x="270" y="220" width="144" height="30" rx="15"/>
+<rect x="427" y="220" width="138" height="30" rx="15"/>
+</g>
+<text x="137" y="240" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Live Attendance</text>
+<text x="284" y="240" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Revenue Tracking</text>
+<text x="441" y="240" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">Member Insights</text>
+<text x="1290" y="140" fill="#C8BFCA" font-family="Arial, sans-serif" font-size="20">Peak Performance Mode</text>
+<text x="1375" y="195" fill="#FFEDEF" font-family="Arial, sans-serif" font-size="50" font-weight="700">24/7</text>
+<rect x="95" y="285" width="1410" height="62" rx="8" fill="#0A0E18" stroke="#1D2432"/>
+<rect x="115" y="294" width="130" height="44" rx="15" fill="#7B3437" stroke="#B04B4F"/>
+<text x="125" y="322" fill="#FFF1F1" font-family="Arial, sans-serif" font-size="18" font-weight="700">Dashboard</text>
+<text x="260" y="322" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Member Plans</text>
+<text x="430" y="322" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Trainer Assignment</text>
+<text x="615" y="322" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Attendance</text>
+<text x="735" y="322" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Payment Tracking</text>
+<text x="960" y="322" fill="#D4D8E2" font-family="Arial, sans-serif" font-size="18" font-weight="700">Admin Users</text>
+<text x="1335" y="322" fill="#8790A1" font-family="Arial, sans-serif" font-size="18">admin</text>
+<rect x="1400" y="295" width="72" height="40" rx="14" fill="#141A28" stroke="#B04B4F"/>
+<text x="1412" y="321" fill="#FFC5C5" font-family="Arial, sans-serif" font-size="17" font-weight="700">Logout</text>
+<rect x="95" y="367" width="1410" height="395" rx="22" fill="#070B14" stroke="#1D2432"/>
+<text x="125" y="425" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="40" font-weight="700">Dashboard Overview</text>
+<g fill="#0E1420" stroke="#232C3D">
+<rect x="125" y="455" width="320" height="110" rx="20"/>
+<rect x="460" y="455" width="320" height="110" rx="20"/>
+<rect x="795" y="455" width="320" height="110" rx="20"/>
+<rect x="1130" y="455" width="320" height="110" rx="20"/>
+</g>
+<text x="145" y="495" fill="#9CA4B5" font-family="Arial, sans-serif" font-size="18">Total Members</text>
+<text x="145" y="535" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="42">0</text>
+<text x="480" y="495" fill="#9CA4B5" font-family="Arial, sans-serif" font-size="18">Active Members</text>
+<text x="480" y="535" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="42">0</text>
+<text x="815" y="495" fill="#9CA4B5" font-family="Arial, sans-serif" font-size="18">Total Trainers</text>
+<text x="815" y="535" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="42">2</text>
+<text x="1150" y="495" fill="#9CA4B5" font-family="Arial, sans-serif" font-size="18">Today Attendance</text>
+<text x="1150" y="535" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="42">0</text>
+<rect x="125" y="585" width="655" height="100" rx="20" fill="#0E1420" stroke="#232C3D"/>
+<text x="145" y="625" fill="#9CA4B5" font-family="Arial, sans-serif" font-size="18">Total Revenue</text>
+<text x="145" y="660" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="42">Rs 0</text>
+<rect x="125" y="705" width="1325" height="88" rx="8" fill="#0A0F19" stroke="#232C3D"/>
+<text x="145" y="742" fill="#F2F4FA" font-family="Arial, sans-serif" font-size="22" font-weight="700">Quick Notes</text>
+<text x="145" y="772" fill="#6E7788" font-family="Arial, sans-serif" font-size="18">Use Member Plans for subscription updates, Attendance for daily logs, and Payment Tracking to verify due collections.</text>
+<defs>
+<linearGradient id="paint0_linear" x1="95" y1="160" x2="1505" y2="160" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0A0E18"/>
+<stop offset="0.68" stop-color="#662021" stop-opacity="0.72"/>
+<stop offset="1" stop-color="#25141A"/>
+</linearGradient>
+</defs>
+</svg>
